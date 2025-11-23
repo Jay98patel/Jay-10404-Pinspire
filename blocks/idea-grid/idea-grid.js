@@ -1,8 +1,6 @@
 import {
   loadIdeas,
   searchIdeasByTitle,
-  filterIdeasByCategory,
-  filterTrendingIdeas,
   sortIdeasNewestFirst,
 } from '../../scripts/pi-ideas-index.js';
 import { getFavoritesList } from '../../scripts/pi-favorites.js';
@@ -25,8 +23,6 @@ export default async function decorate(block) {
   block.textContent = '';
   block.append(container);
 
-  const allIdeas = favoritesOnly ? getFavoritesList() : await loadIdeas();
-
   const state = {
     query: '',
     category: 'all',
@@ -35,60 +31,71 @@ export default async function decorate(block) {
     newestFirst: block.classList.contains('newest'),
   };
 
-  function getSourceIdeas() {
+  async function getBaseIdeas() {
     if (state.favoritesOnly) {
       return getFavoritesList();
     }
-    return allIdeas;
+    if (state.query) {
+      return searchIdeasByTitle(state.query);
+    }
+    return loadIdeas();
   }
 
-  async function applyFilters() {
-    let ideas = getSourceIdeas();
-
-    if (state.query) {
-      const q = state.query.trim().toLowerCase();
-      if (state.favoritesOnly) {
-        ideas = ideas.filter((idea) => {
-          const title = (idea.title || '').toLowerCase();
-          const desc = (idea.description || '').toLowerCase();
-          const tags = Array.isArray(idea.tags) ? idea.tags : [];
-          const tagsText = tags.join(' ').toLowerCase();
-          return (
-            title.includes(q) ||
-            desc.includes(q) ||
-            tagsText.includes(q)
-          );
-        });
-      } else {
-        ideas = await searchIdeasByTitle(state.query);
-      }
+  function applyCategoryFilter(ideas) {
+    const list = Array.isArray(ideas) ? ideas.slice() : [];
+    if (!state.category || state.category === 'all') {
+      return list;
     }
+    const cat = state.category.trim().toLowerCase();
+    return list.filter((idea) => {
+      if (!idea.category) return false;
+      return idea.category.trim().toLowerCase() === cat;
+    });
+  }
 
-    if (state.category && state.category !== 'all') {
-      ideas = ideas.filter((idea) => {
-        if (!idea.category) return false;
-        return idea.category.trim().toLowerCase() === state.category;
-      });
+  function applyTrendingFilter(ideas) {
+    if (!state.trendingOnly) {
+      return ideas;
     }
+    return ideas.filter((idea) => idea.isTrending);
+  }
 
-    if (state.trendingOnly) {
-      const trending = await filterTrendingIdeas();
-      const map = {};
-      trending.forEach((idea) => {
-        map[idea.id] = true;
-      });
-      ideas = ideas.filter((idea) => map[idea.id]);
+  function applyNewestFilter(ideas) {
+    if (!state.newestFirst) {
+      return ideas;
     }
+    return sortIdeasNewestFirst(ideas);
+  }
 
-    if (state.newestFirst) {
-      ideas = sortIdeasNewestFirst(ideas);
+  function applyFavoritesSearchFilter(ideas) {
+    if (!state.favoritesOnly || !state.query) {
+      return ideas;
     }
+    const q = state.query.trim().toLowerCase();
+    return ideas.filter((idea) => {
+      const title = (idea.title || '').toLowerCase();
+      const desc = (idea.description || '').toLowerCase();
+      const tags = Array.isArray(idea.tags) ? idea.tags : [];
+      const tagsText = tags.join(' ').toLowerCase();
+      return (
+        title.includes(q) ||
+        desc.includes(q) ||
+        tagsText.includes(q)
+      );
+    });
+  }
 
+  async function gatherIdeas() {
+    let ideas = await getBaseIdeas();
+    ideas = applyFavoritesSearchFilter(ideas);
+    ideas = applyCategoryFilter(ideas);
+    ideas = applyTrendingFilter(ideas);
+    ideas = applyNewestFilter(ideas);
     return ideas;
   }
 
   async function render() {
-    const ideas = await applyFilters();
+    const ideas = await gatherIdeas();
     container.innerHTML = '';
     if (!ideas.length) {
       let title;

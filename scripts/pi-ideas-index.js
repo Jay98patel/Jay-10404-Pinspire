@@ -87,28 +87,15 @@ export async function searchIdeasByTitle(query) {
     return ideas.slice();
   }
   return ideas.filter((idea) => {
+    const title = idea.title.toLowerCase();
+    const desc = idea.description.toLowerCase();
+    const tagsText = idea.tags.join(' ').toLowerCase();
     return (
-      idea.title.toLowerCase().includes(q) ||
-      idea.description.toLowerCase().includes(q) ||
-      idea.tags.some((tag) => tag.toLowerCase().includes(q))
+      title.includes(q) ||
+      desc.includes(q) ||
+      tagsText.includes(q)
     );
   });
-}
-
-export async function filterIdeasByCategory(category) {
-  const cat = (category || '').trim().toLowerCase();
-  const ideas = await fetchIndex();
-  if (!cat || cat === 'all') {
-    return ideas.slice();
-  }
-  return ideas.filter(
-    (idea) => idea.category && idea.category.trim().toLowerCase() === cat,
-  );
-}
-
-export async function filterTrendingIdeas() {
-  const ideas = await fetchIndex();
-  return ideas.filter((idea) => idea.isTrending);
 }
 
 export function sortIdeasNewestFirst(ideas) {
@@ -123,15 +110,4 @@ export function sortIdeasNewestFirst(ideas) {
 
 export function getCachedIdeas() {
   return indexCache ? indexCache.slice() : null;
-}
-
-if (typeof window !== 'undefined') {
-  window.piIndexClient = {
-    loadIdeas,
-    searchIdeasByTitle,
-    filterIdeasByCategory,
-    filterTrendingIdeas,
-    sortIdeasNewestFirst,
-    getCachedIdeas,
-  };
 }

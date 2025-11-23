@@ -1,14 +1,21 @@
-.block.section-header {
-  margin: 16px 0;
+.section-header.block {
+  margin-bottom: 16px;
 }
 
-.block.section-header .pi-section-header {
+.section-header.block .pi-section-header-inner {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.block.section-header .pi-section-header.pi-section-header--center {
-  text-align: center;
-  align-items: center;
+.section-header.block .pi-section-title {
+  font-size: var(--heading-font-size-m);
+  font-weight: 600;
+  margin: 0;
+}
+
+.section-header.block .pi-section-subtitle {
+  margin: 0;
+  font-size: var(--body-font-size-xs);
+  color: var(--pi-color-text-muted);
 }

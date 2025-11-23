@@ -1,31 +1,24 @@
 export default function decorate(block) {
-  const pieces = [];
-  block.querySelectorAll('h1, h2, h3, h4, h5, h6, p, strong').forEach((node) => {
-    const text = node.textContent.trim();
-    if (text) {
-      pieces.push(text);
-    }
-  });
+  const row = block.querySelector(':scope > div');
+  if (!row) return;
 
-  const title = pieces[0] || '';
-  const subtitle = pieces[1] || '';
+  const cells = Array.from(row.children);
+  const titleText = cells[0] ? cells[0].textContent.trim() : '';
+  const subtitleText = cells[1] ? cells[1].textContent.trim() : '';
 
   const wrapper = document.createElement('div');
-  wrapper.className = 'pi-section-header';
-  if (block.classList.contains('centered')) {
-    wrapper.classList.add('pi-section-header--center');
-  }
+  wrapper.className = 'pi-section-header-inner';
 
   const titleEl = document.createElement('h2');
   titleEl.className = 'pi-section-title';
-  titleEl.textContent = title;
+  titleEl.textContent = titleText;
   wrapper.append(titleEl);
 
-  if (subtitle) {
-    const subEl = document.createElement('p');
-    subEl.className = 'pi-section-subtitle';
-    subEl.textContent = subtitle;
-    wrapper.append(subEl);
+  if (subtitleText) {
+    const subtitleEl = document.createElement('p');
+    subtitleEl.className = 'pi-section-subtitle';
+    subtitleEl.textContent = subtitleText;
+    wrapper.append(subtitleEl);
   }
 
   block.textContent = '';

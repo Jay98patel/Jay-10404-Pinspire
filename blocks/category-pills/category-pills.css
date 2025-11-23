@@ -1,3 +1,27 @@
-.block.category-pills {
+.category-pills.block {
   margin: 8px 0 16px;
+}
+
+.category-pills.block .pi-category-pills-inner {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.category-pills.block .pi-category-pill {
+  border-radius: var(--pi-radius-pill);
+  border: none;
+  padding: 6px 14px;
+  font-size: var(--body-font-size-xs);
+  background-color: var(--pi-color-chip-default-bg);
+  color: var(--pi-color-chip-default-text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.category-pills.block .pi-category-pill.is-active {
+  background-color: var(--pi-color-chip-active-bg);
+  color: var(--pi-color-chip-active-text);
 }

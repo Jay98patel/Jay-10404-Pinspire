@@ -1,45 +1,43 @@
 export default function decorate(block) {
-  const labels = [];
-  block.querySelectorAll('p, li, span').forEach((node) => {
-    const text = node.textContent.trim();
-    if (text) {
-      labels.push(text);
-    }
-  });
-  if (!labels.length) {
-    labels.push('All');
-  }
-  block.textContent = '';
+  const row = block.querySelector(':scope > div');
+  if (!row) return;
 
-  const row = document.createElement('div');
-  row.className = 'pi-pill-row';
+  const labels = Array.from(row.children)
+    .map((cell) => cell.textContent.trim())
+    .filter(Boolean);
 
-  labels.forEach((label, index) => {
-    const pill = document.createElement('button');
-    pill.type = 'button';
-    pill.className = 'pi-pill';
-    pill.textContent = label;
+  const pills = labels.length ? labels : ['All'];
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'pi-category-pills-inner';
+
+  pills.forEach((label, index) => {
     const value = label.toLowerCase();
-    pill.dataset.category = value === 'ideas' ? 'all' : value;
+    const normalized = value === 'all' ? 'all' : value.replace(/\s+/g, '-');
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'pi-category-pill';
     if (index === 0) {
-      pill.classList.add('pi-pill--active');
+      button.classList.add('is-active');
     }
-    row.append(pill);
-  });
+    button.dataset.category = normalized;
+    button.textContent = label;
 
-  block.append(row);
+    button.addEventListener('click', () => {
+      const siblings = wrapper.querySelectorAll('.pi-category-pill');
+      siblings.forEach((b) => b.classList.remove('is-active'));
+      button.classList.add('is-active');
 
-  row.addEventListener('click', (event) => {
-    const target = event.target.closest('.pi-pill');
-    if (!target) {
-      return;
-    }
-    row.querySelectorAll('.pi-pill').forEach((pill) => pill.classList.remove('pi-pill--active'));
-    target.classList.add('pi-pill--active');
-    const category = target.dataset.category || 'all';
-    const custom = new CustomEvent('pinspire:category-changed', {
-      detail: { category },
+      const event = new CustomEvent('pinspire:category-changed', {
+        detail: { category: normalized },
+      });
+      window.dispatchEvent(event);
     });
-    window.dispatchEvent(custom);
+
+    wrapper.append(button);
   });
+
+  block.textContent = '';
+  block.append(wrapper);
 }
