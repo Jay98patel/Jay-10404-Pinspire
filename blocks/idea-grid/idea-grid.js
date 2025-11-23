@@ -8,11 +8,24 @@ import { createIdeaCard } from '../idea-card/idea-card.js';
 import { createEmptyState } from '../empty-state/empty-state.js';
 import { requireAuth } from '../../scripts/pi-auth.js';
 
+function ensureIdeaCardStyles() {
+  if (typeof document === 'undefined') return;
+  const id = 'pi-idea-card-styles';
+  if (document.getElementById(id)) return;
+  const link = document.createElement('link');
+  link.id = id;
+  link.rel = 'stylesheet';
+  link.href = '/blocks/idea-card/idea-card.css';
+  document.head.appendChild(link);
+}
+
 export default async function decorate(block) {
+  ensureIdeaCardStyles();
+
   const isFavoritesRoute =
-    typeof window !== 'undefined' &&
-    window.location &&
-    window.location.pathname.startsWith('/my-favorites');
+    typeof window !== 'undefined'
+    && window.location
+    && window.location.pathname.startsWith('/my-favorites');
 
   const favoritesOnly =
     block.classList.contains('favorites-only') || isFavoritesRoute;
@@ -63,9 +76,9 @@ export default async function decorate(block) {
       const tags = Array.isArray(idea.tags) ? idea.tags : [];
       const tagsText = tags.join(' ').toLowerCase();
       return (
-        title.includes(q) ||
-        desc.includes(q) ||
-        tagsText.includes(q)
+        title.includes(q)
+        || desc.includes(q)
+        || tagsText.includes(q)
       );
     });
   }
@@ -82,16 +95,12 @@ export default async function decorate(block) {
   }
 
   function applyTrendingFilter(ideas) {
-    if (!state.trendingOnly) {
-      return ideas;
-    }
+    if (!state.trendingOnly) return ideas;
     return ideas.filter((idea) => idea.isTrending);
   }
 
   function applyNewestFilter(ideas) {
-    if (!state.newestFirst) {
-      return ideas;
-    }
+    if (!state.newestFirst) return ideas;
     return sortIdeasNewestFirst(ideas);
   }
 
@@ -107,8 +116,7 @@ export default async function decorate(block) {
       const sameCat = ideaCat === cat;
       const sameId = state.currentIdeaId && idea.id === state.currentIdeaId;
       const samePath =
-        idea.path &&
-        idea.path.replace(/\/$/, '') === currentPath;
+        idea.path && idea.path.replace(/\/$/, '') === currentPath;
       return sameCat && !sameId && !samePath;
     });
   }
@@ -129,6 +137,7 @@ export default async function decorate(block) {
   async function render() {
     const ideas = await gatherIdeas();
     container.innerHTML = '';
+
     if (!ideas.length) {
       let title;
       let message;
@@ -149,6 +158,7 @@ export default async function decorate(block) {
       container.append(empty);
       return;
     }
+
     ideas.forEach((idea) => {
       const card = createIdeaCard(idea);
       container.append(card);
@@ -163,7 +173,9 @@ export default async function decorate(block) {
   });
 
   window.addEventListener('pinspire:category-changed', (event) => {
-    state.category = event.detail && event.detail.category ? event.detail.category : 'all';
+    state.category = event.detail && event.detail.category
+      ? event.detail.category
+      : 'all';
     render();
   });
 
@@ -174,12 +186,12 @@ export default async function decorate(block) {
   });
 
   window.addEventListener('pinspire:current-idea', (event) => {
-    if (!state.relatedOnly) {
-      return;
-    }
+    if (!state.relatedOnly) return;
     const detail = event.detail || {};
     state.currentIdeaId = detail.id || '';
-    state.currentCategory = detail.category ? detail.category.trim().toLowerCase() : '';
+    state.currentCategory = detail.category
+      ? detail.category.trim().toLowerCase()
+      : '';
     render();
   });
 }

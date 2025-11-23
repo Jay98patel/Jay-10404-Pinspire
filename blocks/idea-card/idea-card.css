@@ -1,12 +1,13 @@
+/* Masonry card inside idea-grid */
 .pi-idea-card {
   position: relative;
   display: inline-block;
   width: 100%;
-  margin-bottom: 16px;
+  margin: 0 0 18px;
   border-radius: 18px;
   overflow: hidden;
   background-color: var(--pi-color-surface, #ffffff);
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
   break-inside: avoid;
 }
 
@@ -28,28 +29,29 @@
   width: 100%;
   height: auto;
   object-fit: cover;
-  transition: transform 200ms ease-out;
+  transition: transform 180ms ease-out;
 }
 
 .pi-idea-card:hover .pi-idea-card-image-wrap img {
   transform: scale(1.03);
 }
 
+/* Heart on image – outline vs filled via ::before */
 .pi-idea-card-fav {
   position: absolute;
   top: 8px;
   right: 8px;
+  width: 32px;
+  height: 32px;
   border-radius: 999px;
-  padding: 6px 10px;
   border: 1px solid #e60023;
   background-color: rgba(255, 255, 255, 0.96);
-  color: #e60023;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  line-height: 1;
+  padding: 0;
+  outline: none;
   opacity: 0;
   transform: translateY(-4px);
   pointer-events: none;
@@ -57,36 +59,52 @@
     opacity 160ms ease-out,
     transform 160ms ease-out,
     background-color 160ms ease-out,
-    color 160ms ease-out,
-    filter 160ms ease-out;
+    border-color 160ms ease-out,
+    color 160ms ease-out;
+}
+
+.pi-idea-card-fav::before {
+  content: '♡';
+  font-size: 18px;
+  line-height: 1;
+  color: #e60023;
 }
 
 .pi-idea-card-fav.is-active {
   background-color: #e60023;
-  color: #ffffff;
   border-color: #e60023;
-  filter: brightness(0.96);
 }
 
+.pi-idea-card-fav.is-active::before {
+  content: '❤';
+  color: #ffffff;
+}
+
+/* Title overlay – small text, only on hover */
 .pi-idea-card-overlay {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 10px 12px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+  padding: 8px 10px;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7),
+    rgba(0, 0, 0, 0)
+  );
   color: #ffffff;
   opacity: 0;
-  transform: translateY(20%);
+  transform: translateY(18%);
   transition: opacity 160ms ease-out, transform 160ms ease-out;
 }
 
 .pi-idea-card-title {
   margin: 0;
-  font-size: var(--body-font-size-s);
+  font-size: 13px;
   font-weight: 600;
 }
 
+/* Reveal heart + title on hover */
 .pi-idea-card:hover .pi-idea-card-fav,
 .pi-idea-card:hover .pi-idea-card-overlay {
   opacity: 1;

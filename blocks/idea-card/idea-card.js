@@ -30,7 +30,6 @@ export function createIdeaCard(idea) {
 
   function renderFav(active) {
     favButton.classList.toggle('is-active', active);
-    favButton.textContent = active ? '❤' : '♡';
   }
 
   const initialActive = isAuthenticated() && isFavorite(id);

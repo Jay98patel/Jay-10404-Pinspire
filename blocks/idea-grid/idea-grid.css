@@ -1,10 +1,11 @@
 .idea-grid.block {
-  margin-top: 16px;
+  margin-top: 24px; /* space below “Browse by category” */
 }
 
+/* Pinterest-style masonry columns */
 .idea-grid.block .pi-idea-grid-inner {
   column-count: 5;
-  column-gap: 16px;
+  column-gap: 20px;
 }
 
 @media (max-width: 1400px) {
