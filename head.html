@@ -1,10 +1,32 @@
-<meta
-  http-equiv="Content-Security-Policy"
-  content="script-src 'nonce-aem' 'strict-dynamic' 'unsafe-inline' http: https:; base-uri 'self'; object-src 'none';"
-  move-to-http-header="true"
->
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<script nonce="aem" src="/scripts/aem.js" type="module"></script>
-<script nonce="aem" src="/scripts/scripts.js" type="module"></script>
-<link rel="stylesheet" href="/styles/styles.css"/>
-<link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+<head>
+  <meta charset="utf-8">
+  <title>${title}</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="${description}">
+  <meta name="theme-color" content="#ffffff">
+
+  <meta property="og:title" content="${og-title}">
+  <meta property="og:description" content="${og-description}">
+  <meta property="og:image" content="${og-image}">
+  <meta property="og:type" content="website">
+
+  <meta name="category" content="${category}">
+  <meta name="article:tag" content="${tags}">
+  <meta name="createdAt" content="${createdAt}">
+  <meta name="isTrending" content="${isTrending}">
+  <meta name="id" content="${id}">
+
+  <meta name="twitter:card" content="${twitter-card}">
+  <meta name="twitter:title" content="${twitter-title}">
+  <meta name="twitter:description" content="${twitter-description}">
+  <meta name="twitter:image" content="${twitter-image}">
+
+  <link rel="icon" href="/favicon.ico">
+
+  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="/styles/lazy-styles.css" media="screen and (min-width: 768px)">
+
+  <script type="module" src="/scripts/scripts.js"></script>
+  <script type="module" src="/scripts/delayed.js" defer></script>
+</head>
