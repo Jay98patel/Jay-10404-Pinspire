@@ -1,8 +1,12 @@
 version: 1
 
 indices:
+  # Existing index (leave as-is if you’re still using /query-index.json elsewhere)
+  # query-index:
+  #   ...
+
   pi-ideas:
-    # only idea detail pages
+    # Only index idea detail pages
     include:
       - '/ideas/**'
     exclude:
@@ -15,7 +19,8 @@ indices:
       - '/metadata/**'
       - '/favicon.ico'
       - '/404*'
-    # NEW: dedicated ideas index
+
+    # The JSON URL your JS will fetch
     target: /pi-ideas-index.json
 
     properties:
@@ -37,12 +42,12 @@ indices:
         value: |
           attribute(el, 'content')
 
-      # 🔴 IMPORTANT: pick the hero image from the document itself
+      # 🔴 Take the hero image from the document itself
       image:
-        # first <img> inside <main> on the idea page
-        select: main img
+        # first image in main (covers both <img> and <picture><img>)
+        select: main picture img, main img
         value: |
-          # strip the domain, keep the relative path (e.g. /icons/pinspire-og-sunset-hike.png?width=1200...)
+          # strip domain: https://.../icons/foo.png -> /icons/foo.png...
           match(attribute(el, 'src'), 'https:\/\/[^/]+(\/.*)')
 
       category:
