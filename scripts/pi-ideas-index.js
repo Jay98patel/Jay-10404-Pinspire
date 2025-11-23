@@ -1,110 +1,135 @@
 const INDEX_URL = '/query-index.json';
 
-let ideasPromise = null;
+let indexCache = null;
+let indexPromise = null;
 
-async function fetchIdeasFromIndex() {
-  const response = await fetch(INDEX_URL, { credentials: 'same-origin' });
-  if (!response.ok) {
-    throw new Error('Failed to load ideas index');
+function parseBoolean(value) {
+  if (typeof value === 'boolean') return value;
+  if (typeof value !== 'string') return false;
+  const v = value.trim().toLowerCase();
+  return v === 'true' || v === 'yes' || v === '1';
+}
+
+function normalizeTags(raw) {
+  if (Array.isArray(raw)) {
+    return raw.map((t) => String(t).trim()).filter(Boolean);
   }
-  const json = await response.json();
-  const rows = Array.isArray(json.data) ? json.data : [];
-  return rows.map((row, index) => {
-    const title = row.title || row.Title || row['card-title'] || '';
-    const image =
-      row.image ||
-      row.Image ||
-      row['card-image'] ||
-      row['image-url'] ||
-      '';
-    const category = row.category || row.Category || '';
-    const tagsValue = row.tags || row.Tags || '';
-    const tags =
-      typeof tagsValue === 'string'
-        ? tagsValue
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean)
-        : [];
-    const trendingValue = row.trending || row.Trending;
-    const isTrending =
-      trendingValue === true ||
-      trendingValue === 'true' ||
-      trendingValue === 'yes';
-    const favoritesValue = row.favorites || row.Favorites || 0;
-    const favorites = Number(favoritesValue) || 0;
-    const created =
-      row.created ||
-      row.Created ||
-      row['Last Modified'] ||
-      row.date ||
-      '';
-    const id =
-      row.id ||
-      row.ID ||
-      row['card-id'] ||
-      row.path ||
-      row.Path ||
-      String(index);
-    return {
-      id,
-      title,
-      image,
-      category,
-      tags,
-      isTrending,
-      favorites,
-      created,
-      raw: row,
-    };
+  if (typeof raw === 'string') {
+    return raw
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function normalizeDate(raw) {
+  if (!raw) return null;
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return null;
+  return d;
+}
+
+function normalizeIdea(row) {
+  const createdAtDate = normalizeDate(row.createdAt || row.date);
+  return {
+    path: row.path || '',
+    id: row.id || row.path || '',
+    title: row.title || '',
+    description: row.description || '',
+    image: row.image || '',
+    category: row.category || '',
+    tags: normalizeTags(row.tags),
+    createdAt: createdAtDate,
+    createdAtRaw: row.createdAt || row.date || '',
+    isTrending: parseBoolean(row.isTrending),
+  };
+}
+
+async function fetchIndex() {
+  if (indexCache) {
+    return indexCache;
+  }
+  if (!indexPromise) {
+    indexPromise = fetch(INDEX_URL, { headers: { accept: 'application/json' } })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Index request failed with status ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((json) => {
+        const rows = Array.isArray(json.data) ? json.data : [];
+        const ideas = rows
+          .map(normalizeIdea)
+          .filter((idea) => idea.path && idea.title);
+        indexCache = ideas;
+        return ideas;
+      })
+      .catch((err) => {
+        console.error('Failed to load ideas index', err);
+        indexCache = [];
+        return indexCache;
+      });
+  }
+  return indexPromise;
+}
+
+async function loadIdeas() {
+  const ideas = await fetchIndex();
+  return ideas.slice();
+}
+
+async function searchIdeas(query) {
+  const q = (query || '').trim().toLowerCase();
+  if (!q) {
+    return loadIdeas();
+  }
+  const ideas = await fetchIndex();
+  return ideas.filter((idea) => {
+    return (
+      idea.title.toLowerCase().includes(q) ||
+      idea.description.toLowerCase().includes(q) ||
+      idea.tags.some((tag) => tag.toLowerCase().includes(q))
+    );
   });
 }
 
-export function loadIdeas() {
-  if (!ideasPromise) {
-    ideasPromise = fetchIdeasFromIndex().catch((error) => {
-      console.error(error);
-      return [];
-    });
+async function filterByCategory(category) {
+  const cat = (category || '').trim().toLowerCase();
+  const ideas = await fetchIndex();
+  if (!cat || cat === 'all') {
+    return ideas.slice();
   }
-  return ideasPromise;
-}
-
-export function searchIdeasByTitle(ideas, query) {
-  const value = String(query || '').trim().toLowerCase();
-  if (!value) {
-    return ideas;
-  }
-  return ideas.filter((idea) =>
-    String(idea.title || '')
-      .toLowerCase()
-      .includes(value),
+  return ideas.filter(
+    (idea) => idea.category && idea.category.trim().toLowerCase() === cat,
   );
 }
 
-export function filterIdeasByCategory(ideas, category) {
-  const value = String(category || '').trim().toLowerCase();
-  if (!value || value === 'all') {
-    return ideas;
-  }
-  return ideas.filter((idea) => {
-    const cat = String(idea.category || '').toLowerCase();
-    if (cat === value) {
-      return true;
-    }
-    const tags = Array.isArray(idea.tags) ? idea.tags : [];
-    return tags.some((tag) => String(tag).toLowerCase() === value);
-  });
-}
-
-export function filterTrendingIdeas(ideas) {
+async function filterTrending() {
+  const ideas = await fetchIndex();
   return ideas.filter((idea) => idea.isTrending);
 }
 
-export function sortIdeasNewestFirst(ideas) {
-  return [...ideas].sort((a, b) => {
-    const aDate = new Date(a.created || 0).getTime();
-    const bDate = new Date(b.created || 0).getTime();
-    return bDate - aDate;
+function sortByNewest(ideas) {
+  const source = Array.isArray(ideas) ? ideas.slice() : [];
+  source.sort((a, b) => {
+    const aTime = a.createdAt ? a.createdAt.getTime() : 0;
+    const bTime = b.createdAt ? b.createdAt.getTime() : 0;
+    return bTime - aTime;
   });
+  return source;
 }
+
+function getCachedIndex() {
+  return indexCache ? indexCache.slice() : null;
+}
+
+window.piIndexClient = {
+  loadIdeas,
+  searchIdeas,
+  filterByCategory,
+  filterTrending,
+  sortByNewest,
+  getCachedIndex,
+};
