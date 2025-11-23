@@ -42,33 +42,68 @@ export default async function decorate(block) {
     return allIdeas;
   }
 
-  function applyFilters() {
+  async function applyFilters() {
     let ideas = getSourceIdeas();
+
     if (state.query) {
-      ideas = searchIdeasByTitle(ideas, state.query);
+      const q = state.query.trim().toLowerCase();
+      if (state.favoritesOnly) {
+        ideas = ideas.filter((idea) => {
+          const title = (idea.title || '').toLowerCase();
+          const desc = (idea.description || '').toLowerCase();
+          const tags = Array.isArray(idea.tags) ? idea.tags : [];
+          const tagsText = tags.join(' ').toLowerCase();
+          return (
+            title.includes(q) ||
+            desc.includes(q) ||
+            tagsText.includes(q)
+          );
+        });
+      } else {
+        ideas = await searchIdeasByTitle(state.query);
+      }
     }
+
     if (state.category && state.category !== 'all') {
-      ideas = filterIdeasByCategory(ideas, state.category);
+      ideas = ideas.filter((idea) => {
+        if (!idea.category) return false;
+        return idea.category.trim().toLowerCase() === state.category;
+      });
     }
+
     if (state.trendingOnly) {
-      ideas = filterTrendingIdeas(ideas);
+      const trending = await filterTrendingIdeas();
+      const map = {};
+      trending.forEach((idea) => {
+        map[idea.id] = true;
+      });
+      ideas = ideas.filter((idea) => map[idea.id]);
     }
+
     if (state.newestFirst) {
       ideas = sortIdeasNewestFirst(ideas);
     }
+
     return ideas;
   }
 
-  function render() {
-    const ideas = applyFilters();
+  async function render() {
+    const ideas = await applyFilters();
     container.innerHTML = '';
     if (!ideas.length) {
-      const empty = createEmptyState({
-        title: favoritesOnly ? 'No favorites yet' : 'No ideas found',
-        message: favoritesOnly
-          ? 'Save ideas you love and they will show up here.'
-          : 'Try a different search term or category.',
-      });
+      let title;
+      let message;
+      if (state.query) {
+        title = 'No ideas found';
+        message = `No ideas match “${state.query}”.`;
+      } else if (state.favoritesOnly) {
+        title = 'No favorites yet';
+        message = 'Save ideas you love and they will show up here.';
+      } else {
+        title = 'No ideas yet';
+        message = 'Content will appear here once ideas are published.';
+      }
+      const empty = createEmptyState({ title, message });
       container.append(empty);
       return;
     }

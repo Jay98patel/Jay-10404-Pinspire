@@ -1,114 +1,47 @@
-import { bindFavoriteToggle } from '../../scripts/pi-favorites.js';
-
-function generateIdFromTitle(title) {
-  if (!title) {
-    return String(Date.now());
-  }
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-}
+import { toggleFavorite, isFavorite } from '../../scripts/pi-favorites.js';
 
 export function createIdeaCard(idea) {
-  const data = idea || {};
-  const id = data.id || generateIdFromTitle(data.title);
-  const title = data.title || '';
-  const description = data.description || '';
-  const image = data.image || '';
-  const href = data.href || data.url || '#';
-  const category = data.category || '';
+  const safeIdea = idea || {};
+  const id = safeIdea.id || '';
+  const title = safeIdea.title || '';
+  const description = safeIdea.description || '';
+  const category = safeIdea.category || '';
+  const image = safeIdea.image || '';
+  const active = isFavorite(id);
 
   const card = document.createElement('article');
-  card.className = 'pi-card pi-idea-card';
-  card.dataset.ideaId = id;
+  card.className = 'pi-idea-card';
+  card.dataset.id = id;
 
-  const media = document.createElement('div');
-  media.className = 'pi-card-media';
+  card.innerHTML = `
+    <div class="pi-idea-card-image">
+      <img src="${image}" alt="${title}">
+      <button type="button" class="pi-idea-card-fav ${active ? 'is-active' : ''}" aria-label="Toggle favorite">
+        ❤
+      </button>
+    </div>
+    <div class="pi-idea-card-body">
+      <div class="pi-idea-card-title">${title}</div>
+      ${description ? `<div class="pi-idea-card-description">${description}</div>` : ''}
+      ${category ? `<div class="pi-idea-card-category-pill">${category}</div>` : ''}
+    </div>
+  `;
 
-  const link = document.createElement('a');
-  link.href = href;
-  link.tabIndex = 0;
-
-  const img = document.createElement('img');
-  img.loading = 'lazy';
-  img.src = image;
-  img.alt = title;
-
-  link.append(img);
-  media.append(link);
-
-  const favButton = document.createElement('button');
-  favButton.type = 'button';
-  favButton.className = 'pi-card-fav-button';
-  favButton.innerHTML = '❤';
-
-  media.append(favButton);
-
-  const body = document.createElement('div');
-  body.className = 'pi-card-body';
-
-  const titleEl = document.createElement('div');
-  titleEl.className = 'pi-card-title';
-  titleEl.textContent = title;
-  body.append(titleEl);
-
-  if (category) {
-    const metaEl = document.createElement('div');
-    metaEl.className = 'pi-card-meta';
-    metaEl.textContent = category;
-    body.append(metaEl);
-  }
-
-  if (description) {
-    const descEl = document.createElement('p');
-    descEl.className = 'pi-card-description';
-    descEl.textContent = description;
-    body.append(descEl);
-  }
-
-  card.append(media, body);
-
-  bindFavoriteToggle(favButton, {
-    id,
-    title,
-    description,
-    image,
-    href,
-    category,
+  const favButton = card.querySelector('.pi-idea-card-fav');
+  favButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const nowActive = toggleFavorite(safeIdea);
+    favButton.classList.toggle('is-active', nowActive);
   });
 
   return card;
 }
 
 export default function decorate(block) {
-  const picture = block.querySelector('picture, img');
-  const heading = block.querySelector('h1, h2, h3, h4, h5, h6, strong');
-  const desc = block.querySelector('p');
-  const categoryNode = block.querySelector('em');
-  const link = block.querySelector('a');
-
-  const title = heading ? heading.textContent.trim() : '';
-  const description = desc ? desc.textContent.trim() : '';
-  const category = categoryNode ? categoryNode.textContent.trim() : '';
-  let image = '';
-  if (picture) {
-    const imgEl = picture.tagName.toLowerCase() === 'img' ? picture : picture.querySelector('img');
-    if (imgEl) {
-      image = imgEl.currentSrc || imgEl.src;
-    }
-  }
-  const href = link ? link.getAttribute('href') : '#';
-
-  const id = block.dataset.id || generateIdFromTitle(title);
-
-  const idea = {
-    id,
-    title,
-    description,
-    image,
-    href,
-    category,
-  };
-
-  const card = createIdeaCard(idea);
+  const placeholder = document.createElement('div');
+  placeholder.className = 'pi-idea-card-placeholder';
+  placeholder.textContent = '';
   block.textContent = '';
-  block.append(card);
+  block.append(placeholder);
 }

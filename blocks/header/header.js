@@ -2,6 +2,18 @@ import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import { isAuthenticated, getAuth, logout } from '../../scripts/pi-auth.js';
 
+function debounce(fn, delay) {
+  let handle;
+  return (...args) => {
+    if (handle) {
+      clearTimeout(handle);
+    }
+    handle = setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
+}
+
 export function createSearchBar(onQueryChanged) {
   const wrapper = document.createElement('div');
   wrapper.className = 'pi-search';
@@ -14,14 +26,16 @@ export function createSearchBar(onQueryChanged) {
   const form = wrapper.querySelector('form');
   const input = wrapper.querySelector('input');
 
-  function emit(query) {
+  const emit = (query) => {
     const value = String(query || '').trim();
     const event = new CustomEvent('pinspire:search', { detail: { query: value } });
     window.dispatchEvent(event);
     if (typeof onQueryChanged === 'function') {
       onQueryChanged(value);
     }
-  }
+  };
+
+  const emitDebounced = debounce(emit, 250);
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -29,7 +43,7 @@ export function createSearchBar(onQueryChanged) {
   });
 
   input.addEventListener('input', () => {
-    emit(input.value);
+    emitDebounced(input.value);
   });
 
   return wrapper;

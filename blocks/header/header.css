@@ -120,12 +120,16 @@
 }
 
 .header.block .pi-header-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: 999px;
   padding: 8px 12px;
   background-color: transparent;
   font-size: var(--body-font-size-s);
   cursor: pointer;
+  color: var(--pi-color-text-main);
 }
 
 .header.block .pi-header-login {

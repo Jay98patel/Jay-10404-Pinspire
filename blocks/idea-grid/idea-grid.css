@@ -1,25 +1,15 @@
-.block.idea-grid {
-  margin: 24px 0;
+.idea-grid.block {
+  margin-top: 16px;
 }
 
-.block.idea-grid .pi-idea-grid-inner {
-  column-count: 2;
-  column-gap: var(--pi-gap-md);
+.idea-grid.block .pi-idea-grid-inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
 }
 
-.block.idea-grid .pi-idea-grid-inner > .pi-card {
-  break-inside: avoid;
-  margin-bottom: var(--pi-gap-md);
-}
-
-@media (width >= 768px) {
-  .block.idea-grid .pi-idea-grid-inner {
-    column-count: 3;
-  }
-}
-
-@media (width >= 1200px) {
-  .block.idea-grid .pi-idea-grid-inner {
-    column-count: 4;
+@media (width >= 900px) {
+  .idea-grid.block .pi-idea-grid-inner {
+    gap: 24px;
   }
 }

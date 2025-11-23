@@ -2,73 +2,84 @@ import { readJSON, writeJSON } from './pi-storage.js';
 
 const FAVORITES_KEY = 'pinspire-favorites';
 
-function readMap() {
-  const value = readJSON(FAVORITES_KEY, {}, 'local');
-  if (!value || typeof value !== 'object') {
+function normalizeIdea(idea) {
+  if (!idea) return null;
+  const id = String(idea.id || '').trim();
+  if (!id) return null;
+  return {
+    id,
+    title: idea.title || '',
+    description: idea.description || '',
+    image: idea.image || '',
+    category: idea.category || '',
+    tags: Array.isArray(idea.tags) ? idea.tags : [],
+    path: idea.path || '',
+  };
+}
+
+function getRawMap() {
+  const stored = readJSON(FAVORITES_KEY, {}, 'local');
+  if (!stored || typeof stored !== 'object') {
     return {};
   }
-  return value;
+  return stored;
 }
 
 function writeMap(map) {
   writeJSON(FAVORITES_KEY, map, 'local');
 }
 
+export function getFavoritesMap() {
+  return getRawMap();
+}
+
 export function getFavoritesList() {
-  const map = readMap();
+  const map = getRawMap();
   return Object.values(map);
 }
 
 export function isFavorite(id) {
-  if (!id) {
-    return false;
-  }
-  const map = readMap();
-  return !!map[id];
+  const map = getRawMap();
+  const key = String(id || '').trim();
+  if (!key) return false;
+  return !!map[key];
 }
 
 export function toggleFavorite(idea) {
-  if (!idea || !idea.id) {
+  const map = getRawMap();
+  const normalized = normalizeIdea(idea);
+  if (!normalized) {
     return false;
   }
-  const map = readMap();
-  if (map[idea.id]) {
-    delete map[idea.id];
+  const key = normalized.id;
+  let active;
+  if (map[key]) {
+    delete map[key];
+    active = false;
   } else {
-    map[idea.id] = idea;
+    map[key] = normalized;
+    active = true;
   }
   writeMap(map);
-  const list = Object.values(map);
   if (typeof window !== 'undefined') {
     const event = new CustomEvent('pinspire:favorites-changed', {
-      detail: {
-        id: idea.id,
-        favorites: list,
-      },
+      detail: { id: key, active },
     });
     window.dispatchEvent(event);
   }
-  return !!map[idea.id];
+  return active;
 }
 
-function updateButtonState(button, active) {
-  if (!button) {
-    return;
+export function removeFavorite(id) {
+  const map = getRawMap();
+  const key = String(id || '').trim();
+  if (!key || !map[key]) return;
+  delete map[key];
+  writeMap(map);
+  if (typeof window !== 'undefined') {
+    const event = new CustomEvent('pinspire:favorites-changed', {
+      detail: { id: key, active: false },
+    });
+    window.dispatchEvent(event);
   }
-  button.classList.toggle('is-active', active);
-  button.setAttribute('aria-pressed', active ? 'true' : 'false');
-  button.setAttribute('aria-label', active ? 'Remove from favorites' : 'Save to favorites');
-}
-
-export function bindFavoriteToggle(button, idea) {
-  if (!button || !idea || !idea.id) {
-    return;
-  }
-  const active = isFavorite(idea.id);
-  updateButtonState(button, active);
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    const next = toggleFavorite(idea);
-    updateButtonState(button, next);
-  });
 }

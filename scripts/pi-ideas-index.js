@@ -75,17 +75,17 @@ async function fetchIndex() {
   return indexPromise;
 }
 
-async function loadIdeas() {
+export async function loadIdeas() {
   const ideas = await fetchIndex();
   return ideas.slice();
 }
 
-async function searchIdeas(query) {
+export async function searchIdeasByTitle(query) {
   const q = (query || '').trim().toLowerCase();
-  if (!q) {
-    return loadIdeas();
-  }
   const ideas = await fetchIndex();
+  if (!q) {
+    return ideas.slice();
+  }
   return ideas.filter((idea) => {
     return (
       idea.title.toLowerCase().includes(q) ||
@@ -95,7 +95,7 @@ async function searchIdeas(query) {
   });
 }
 
-async function filterByCategory(category) {
+export async function filterIdeasByCategory(category) {
   const cat = (category || '').trim().toLowerCase();
   const ideas = await fetchIndex();
   if (!cat || cat === 'all') {
@@ -106,12 +106,12 @@ async function filterByCategory(category) {
   );
 }
 
-async function filterTrending() {
+export async function filterTrendingIdeas() {
   const ideas = await fetchIndex();
   return ideas.filter((idea) => idea.isTrending);
 }
 
-function sortByNewest(ideas) {
+export function sortIdeasNewestFirst(ideas) {
   const source = Array.isArray(ideas) ? ideas.slice() : [];
   source.sort((a, b) => {
     const aTime = a.createdAt ? a.createdAt.getTime() : 0;
@@ -121,15 +121,17 @@ function sortByNewest(ideas) {
   return source;
 }
 
-function getCachedIndex() {
+export function getCachedIdeas() {
   return indexCache ? indexCache.slice() : null;
 }
 
-window.piIndexClient = {
-  loadIdeas,
-  searchIdeas,
-  filterByCategory,
-  filterTrending,
-  sortByNewest,
-  getCachedIndex,
-};
+if (typeof window !== 'undefined') {
+  window.piIndexClient = {
+    loadIdeas,
+    searchIdeasByTitle,
+    filterIdeasByCategory,
+    filterTrendingIdeas,
+    sortIdeasNewestFirst,
+    getCachedIdeas,
+  };
+}
