@@ -167,17 +167,27 @@ export default async function decorate(block) {
 
   render();
 
+  // Search filters ALL grids
   window.addEventListener('pinspire:search', (event) => {
     state.query = event.detail && event.detail.query ? event.detail.query : '';
     render();
   });
 
-  window.addEventListener('pinspire:category-changed', (event) => {
-    state.category = event.detail && event.detail.category
-      ? event.detail.category
-      : 'all';
-    render();
-  });
+  // Category chips should ONLY affect the "Browse by category" grid.
+  // That grid’s idea-grid-wrapper comes right after .category-pills-wrapper.
+  const wrapper = block.closest('.idea-grid-wrapper');
+  const prevSibling = wrapper ? wrapper.previousElementSibling : null;
+  const isBrowseByCategoryGrid =
+    prevSibling && prevSibling.classList.contains('category-pills-wrapper');
+
+  if (isBrowseByCategoryGrid) {
+    window.addEventListener('pinspire:category-changed', (event) => {
+      state.category = event.detail && event.detail.category
+        ? event.detail.category
+        : 'all';
+      render();
+    });
+  }
 
   window.addEventListener('pinspire:favorites-changed', () => {
     if (state.favoritesOnly) {
