@@ -3,7 +3,7 @@ version: 1
 indices:
   ideas:
     include:
-      - '/ideas/**'          # only idea detail pages
+      - '/ideas/**'
     exclude:
       - '/icons/**'
       - '/fonts/**'
@@ -15,7 +15,6 @@ indices:
       - '/favicon.ico'
       - '/404*'
     target: /query-index.json
-
     properties:
       path:
         select: path
@@ -35,7 +34,6 @@ indices:
         value: |
           attribute(el, 'content')
 
-      # take the *first* image inside <main> and store only the path (/icons/...)
       image:
         select: main img
         value: |
