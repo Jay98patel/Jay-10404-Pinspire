@@ -29,7 +29,7 @@ export default async function decorate(block) {
   wrapper.innerHTML = `
     <div class="pi-idea-detail-main">
       <div class="pi-idea-detail-image">
-        <img src="${currentIdea.image || ''}" alt="${currentIdea.title || ''}">
+        <img src="${currentIdea.image || '/default-meta-image.png'}" alt="${currentIdea.title || ''}">
         <button type="button" class="pi-idea-card-fav ${active ? 'is-active' : ''}" aria-label="Toggle favorite">
           ❤
         </button>

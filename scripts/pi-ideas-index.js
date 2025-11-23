@@ -1,7 +1,8 @@
 // scripts/pi-ideas-index.js
 
-const INDEX_URL = '/query-index.json'; // JSON version of your query-index sheet
-let ideasCache = null;                 // simple in-memory cache
+// 🔴 use the dedicated ideas index, not /query-index.json
+const INDEX_URL = '/pi-ideas-index.json';
+let ideasCache = null; // simple in-memory cache
 
 function normalizeTags(rawTags) {
   if (!rawTags) return [];
@@ -10,15 +11,19 @@ function normalizeTags(rawTags) {
   const str = String(rawTags).trim();
   if (!str) return [];
 
-  // try JSON first ("[\"tag1\",\"tag2\"]")
+  // Try JSON first: ["tag1","tag2"]
   try {
     const parsed = JSON.parse(str);
-    if (Array.isArray(parsed)) return parsed.map((t) => String(t).trim()).filter(Boolean);
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((t) => String(t).trim())
+        .filter(Boolean);
+    }
   } catch (e) {
-    // ignore, fall through to comma separated parsing
+    // ignore, fall through
   }
 
-  // "tag1, tag2,tag3"
+  // Fallback: "tag1, tag2,tag3"
   return str
     .split(',')
     .map((t) => t.trim())
@@ -39,7 +44,7 @@ function normalizeIdea(row) {
     lastModified = '',
   } = row;
 
-  // only keep real ideas (under /ideas/)
+  // Safety: only keep real ideas (should already be /ideas/** from the index)
   if (!path || !path.startsWith('/ideas/')) return null;
 
   const trending =
@@ -54,7 +59,7 @@ function normalizeIdea(row) {
     id: id || path.replace(/^\/+/, '').replace(/\//g, '-'),
     title,
     description,
-    image,
+    image, // 👈 this is now coming from the document's <main> image
     category,
     tags: normalizeTags(tags),
     createdAt,
