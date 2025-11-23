@@ -1,5 +1,6 @@
 import { showToast } from '../../scripts/pi-toast.js';
-import { setAuth } from '../../scripts/pi-auth.js';
+import { setAuth, consumeReturnUrl } from '../../scripts/pi-auth.js';
+import { login as apiLogin } from '../../scripts/pi-api.js';
 
 export default function decorate(block) {
   const wrapper = document.createElement('div');
@@ -25,19 +26,33 @@ export default function decorate(block) {
   const form = wrapper.querySelector('form');
   const usernameInput = form.querySelector('input[name="username"]');
   const passwordInput = form.querySelector('input[name="password"]');
+  const submitButton = form.querySelector('button[type="submit"]');
 
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
+
     if (!username || !password) {
       showToast('Enter username and password', 'error');
       return;
     }
-    setAuth({ username });
-    showToast('Logged in successfully', 'success');
-    if (typeof window !== 'undefined') {
-      window.location.href = '/';
+
+    submitButton.disabled = true;
+
+    try {
+      const result = await apiLogin({ username, password });
+      setAuth({ username: result.username, token: result.token });
+      showToast('Logged in successfully', 'success');
+      const returnUrl = consumeReturnUrl();
+      if (typeof window !== 'undefined') {
+        window.location.href = returnUrl || '/';
+      }
+    } catch (error) {
+      const message = error && error.message ? error.message : 'Invalid username or password';
+      showToast(message, 'error');
+    } finally {
+      submitButton.disabled = false;
     }
   });
 }

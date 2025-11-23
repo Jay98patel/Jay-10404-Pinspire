@@ -1,6 +1,6 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
-import { isAuthenticated, getAuth } from '../../scripts/pi-auth.js';
+import { isAuthenticated, getAuth, logout } from '../../scripts/pi-auth.js';
 
 export function createSearchBar(onQueryChanged) {
   const wrapper = document.createElement('div');
@@ -59,7 +59,7 @@ export default async function decorate(block) {
   } else {
     const logoSpan = document.createElement('span');
     logoSpan.className = 'pi-header-logo-fallback';
-    logoSpan.textContent = 'Pinspire';
+    logoSpan.textContent = 'P';
     logoLink.append(logoSpan);
   }
 
@@ -83,22 +83,37 @@ export default async function decorate(block) {
   favLink.setAttribute('aria-label', 'My favorites');
   favLink.innerHTML = '❤';
 
-  const profileLink = document.createElement('a');
-  profileLink.className = 'pi-header-profile';
-  profileLink.href = '/login';
+  const userWrapper = document.createElement('div');
+  userWrapper.className = 'pi-header-user';
 
   if (isAuthenticated()) {
     const auth = getAuth();
     const username = auth && auth.username ? String(auth.username) : '';
     const initial = username ? username.charAt(0).toUpperCase() : 'U';
-    profileLink.textContent = initial;
-    profileLink.setAttribute('aria-label', 'Profile');
+
+    const avatar = document.createElement('div');
+    avatar.className = 'pi-header-avatar';
+    avatar.textContent = initial;
+
+    const logoutButton = document.createElement('button');
+    logoutButton.type = 'button';
+    logoutButton.className = 'pi-header-logout';
+    logoutButton.textContent = 'Log out';
+    logoutButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      logout();
+    });
+
+    userWrapper.append(avatar, logoutButton);
   } else {
-    profileLink.textContent = 'Log in';
-    profileLink.setAttribute('aria-label', 'Log in');
+    const loginLink = document.createElement('a');
+    loginLink.href = '/login';
+    loginLink.className = 'pi-header-login';
+    loginLink.textContent = 'Log in';
+    userWrapper.append(loginLink);
   }
 
-  right.append(favLink, profileLink);
+  right.append(favLink, userWrapper);
 
   shell.append(left, center, right);
   block.append(shell);

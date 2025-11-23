@@ -102,7 +102,33 @@
   color: var(--pi-color-fav-icon);
 }
 
-.header.block .pi-header-profile {
+.header.block .pi-header-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header.block .pi-header-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background-color: var(--pi-color-primary-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.header.block .pi-header-logout {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background-color: transparent;
+  font-size: var(--body-font-size-s);
+  cursor: pointer;
+}
+
+.header.block .pi-header-login {
   padding: 0 16px;
   height: 40px;
   border-radius: 999px;
