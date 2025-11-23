@@ -1,7 +1,6 @@
 // scripts/pi-ideas-index.js
 
-// 🔴 Use the dedicated ideas index
-const INDEX_URL = '/pi-ideas-index.json';
+const INDEX_URL = '/query-index.json'; // JSON view of the query-index sheet
 let ideasCache = null;
 
 function normalizeTags(rawTags) {
@@ -11,7 +10,7 @@ function normalizeTags(rawTags) {
   const str = String(rawTags).trim();
   if (!str) return [];
 
-  // Try JSON: ["tag1","tag2"]
+  // Try JSON, e.g. `["tag1","tag2"]`
   try {
     const parsed = JSON.parse(str);
     if (Array.isArray(parsed)) {
@@ -20,10 +19,10 @@ function normalizeTags(rawTags) {
         .filter(Boolean);
     }
   } catch (e) {
-    // ignore, fall back
+    // fall through
   }
 
-  // Fallback: "tag1, tag2,tag3"
+  // Fallback: comma-separated list
   return str
     .split(',')
     .map((t) => t.trim())
@@ -44,7 +43,7 @@ function normalizeIdea(row) {
     lastModified = '',
   } = row;
 
-  // Safety: only real idea pages
+  // Only use real ideas (under /ideas/)
   if (!path || !path.startsWith('/ideas/')) return null;
 
   const trending =
@@ -59,7 +58,7 @@ function normalizeIdea(row) {
     id: id || path.replace(/^\/+/, '').replace(/\//g, '-'),
     title,
     description,
-    image, // 👈 comes from <main> image now
+    image, // e.g. "/icons/pinspire-og-sunset-hike.png"
     category,
     tags: normalizeTags(tags),
     createdAt,
