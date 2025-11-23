@@ -142,6 +142,7 @@ export default async function decorate(block) {
       container.append(empty);
       return;
     }
+    console.log('Rendering ideas:', ideas);
     ideas.forEach((idea) => {
       const card = createIdeaCard(idea);
       container.append(card);

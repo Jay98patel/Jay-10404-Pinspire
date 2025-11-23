@@ -1,6 +1,7 @@
 import { toggleFavorite, isFavorite } from '../../scripts/pi-favorites.js';
 
 export function createIdeaCard(idea) {
+  
   const safeIdea = idea || {};
   const id = safeIdea.id || '';
   const title = safeIdea.title || '';
