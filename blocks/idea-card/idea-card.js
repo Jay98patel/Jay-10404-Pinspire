@@ -33,25 +33,27 @@ export function createIdeaCard(idea) {
     favButton.textContent = active ? '❤' : '♡';
   }
 
-  const active = isFavorite(id);
-  renderFav(active);
+  const initialActive = isAuthenticated() && isFavorite(id);
+  renderFav(initialActive);
 
   favButton.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-
     if (!id) return;
+
+    const doToggle = () => {
+      const nowActive = toggleFavorite(normalizedIdea);
+      renderFav(nowActive);
+    };
 
     if (!isAuthenticated()) {
       openLoginModal(() => {
-        const nowActive = toggleFavorite(normalizedIdea);
-        renderFav(nowActive);
+        doToggle();
       });
       return;
     }
 
-    const nowActive = toggleFavorite(normalizedIdea);
-    renderFav(nowActive);
+    doToggle();
   });
 
   return card;

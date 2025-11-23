@@ -203,6 +203,7 @@ export function requireAuth() {
 export function logout() {
   const w = getWindow();
   clearAuth();
+  removeKey('pinspire-favorites', 'local');
   if (w) {
     w.location.href = '/';
   }
