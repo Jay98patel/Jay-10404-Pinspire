@@ -1,56 +1,68 @@
+// blocks/idea-card/idea-card.js
+
 import { toggleFavorite, isFavorite } from '../../scripts/pi-favorites.js';
 
+/**
+ * Helper to create a card element from an idea object
+ * @param {Object} idea
+ * @returns {HTMLElement}
+ */
 export function createIdeaCard(idea) {
-  
-  const safeIdea = idea || {};
-  const id = safeIdea.id || '';
-  const title = safeIdea.title || '';
-  const description = safeIdea.description || '';
-  const category = safeIdea.category || '';
-  const image = safeIdea.image || '';
-  const path = safeIdea.path || '';
-  const active = isFavorite(id);
+  const {
+    id,
+    path,
+    title,
+    description,
+    image,
+    category,
+  } = idea;
 
   const card = document.createElement('article');
   card.className = 'pi-idea-card';
-  card.dataset.id = id;
+  card.dataset.id = id || '';
+
+  const href = path || '#';
+  const imgSrc = image || '/default-meta-image.png';
 
   card.innerHTML = `
-    <div class="pi-idea-card-image">
-      <img src="${image}" alt="${title}">
-      <button type="button" class="pi-idea-card-fav ${active ? 'is-active' : ''}" aria-label="Toggle favorite">
-        ❤
-      </button>
-    </div>
-    <div class="pi-idea-card-body">
-      <div class="pi-idea-card-title">${title}</div>
-      ${description ? `<div class="pi-idea-card-description">${description}</div>` : ''}
-      ${category ? `<div class="pi-idea-card-category-pill">${category}</div>` : ''}
-    </div>
+    <a class="pi-idea-card-link" href="${href}">
+      <div class="pi-idea-card-image-wrap">
+        <img src="${imgSrc}" alt="${title || ''}">
+        <button type="button" class="pi-idea-card-fav" aria-label="Toggle favorite">
+          ❤
+        </button>
+      </div>
+      <div class="pi-idea-card-body">
+        <h3 class="pi-idea-card-title">${title || ''}</h3>
+        ${description
+          ? `<p class="pi-idea-card-description">${description}</p>`
+          : ''}
+        ${category
+          ? `<div class="pi-idea-card-category-pill">${category}</div>`
+          : ''}
+      </div>
+    </a>
   `;
 
   const favButton = card.querySelector('.pi-idea-card-fav');
+  const active = isFavorite(id);
+  favButton.classList.toggle('is-active', active);
+
   favButton.addEventListener('click', (event) => {
     event.preventDefault();
     event.stopPropagation();
-    const nowActive = toggleFavorite(safeIdea);
+    const nowActive = toggleFavorite(idea);
     favButton.classList.toggle('is-active', nowActive);
   });
-
-  if (path) {
-    card.addEventListener('click', () => {
-      window.location.href = path;
-    });
-    card.style.cursor = 'pointer';
-  }
 
   return card;
 }
 
+/**
+ * Block decorate – optional: if you ever drop an idea-card block directly.
+ * For now we just leave it empty.
+ */
 export default function decorate(block) {
-  const placeholder = document.createElement('div');
-  placeholder.className = 'pi-idea-card-placeholder';
-  placeholder.textContent = '';
+  // idea cards are normally created via createIdeaCard() from other blocks
   block.textContent = '';
-  block.append(placeholder);
 }
