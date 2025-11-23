@@ -1,26 +1,73 @@
-.empty-state.block {
+/* Root card – shared for “What’s new on Pinspire” and other empty states */
+.pi-empty-state {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 440px;
+  margin: 40px auto 56px;
+  padding: 40px 32px;
+  border-radius: 28px;
+
+  background:
+    radial-gradient(circle at top left,
+      rgba(230, 0, 35, 0.10),
+      transparent 55%)
+    var(--pi-color-bg-subtle, #f8fafc);
+
+  border: 1px solid var(--pi-color-border-subtle, #e2e8f0);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+/* Icon “chip” */
+.pi-empty-state-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 22px;
+  color: var(--pi-color-primary, #e60023);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
 }
 
-.pi-empty-state {
-  padding: 40px 16px;
-  text-align: center;
-  width: 100%;
-  color: var(--pi-color-text-muted);
-}
-
-.pi-empty-state-icon {
-  font-size: 32px;
-  margin-bottom: 8px;
-}
-
+/* Title under “What’s new on Pinspire” */
 .pi-empty-state-title {
+  margin: 4px 0 0;
+  font-size: 18px;
   font-weight: 600;
-  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+  color: var(--pi-color-text-main, #0f172a);
 }
 
+/* Supporting copy */
 .pi-empty-state-message {
-  font-size: var(--body-font-size-xs);
+  margin: 0;
+  max-width: 360px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--pi-color-text-muted, #64748b);
+}
+
+/* Slightly bigger on desktop so the area under “What’s new” feels premium */
+@media (min-width: 960px) {
+  .pi-empty-state {
+    padding: 48px 40px;
+    border-radius: 32px;
+    margin-top: 48px;
+  }
+
+  .pi-empty-state-title {
+    font-size: 20px;
+  }
+
+  .pi-empty-state-message {
+    font-size: 15px;
+  }
 }

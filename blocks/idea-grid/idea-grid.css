@@ -31,3 +31,8 @@
     column-count: 1;
   }
 }
+/* Center the empty state nicely inside any idea-grid */
+.idea-grid.block .pi-idea-grid-inner .pi-empty-state {
+  max-width: 440px;
+  margin: 40px auto 56px;
+}
