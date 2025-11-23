@@ -10,6 +10,7 @@ import { requireAuth } from '../../scripts/pi-auth.js';
 
 export default async function decorate(block) {
   const favoritesOnly = block.classList.contains('favorites-only');
+  const relatedOnly = block.classList.contains('related');
 
   if (favoritesOnly) {
     const allowed = requireAuth();
@@ -27,44 +28,21 @@ export default async function decorate(block) {
     query: '',
     category: 'all',
     favoritesOnly,
+    relatedOnly,
     trendingOnly: block.classList.contains('trending'),
     newestFirst: block.classList.contains('newest'),
+    currentIdeaId: '',
+    currentCategory: '',
   };
 
   async function getBaseIdeas() {
     if (state.favoritesOnly) {
       return getFavoritesList();
     }
-    if (state.query) {
+    if (state.query && !state.relatedOnly) {
       return searchIdeasByTitle(state.query);
     }
     return loadIdeas();
-  }
-
-  function applyCategoryFilter(ideas) {
-    const list = Array.isArray(ideas) ? ideas.slice() : [];
-    if (!state.category || state.category === 'all') {
-      return list;
-    }
-    const cat = state.category.trim().toLowerCase();
-    return list.filter((idea) => {
-      if (!idea.category) return false;
-      return idea.category.trim().toLowerCase() === cat;
-    });
-  }
-
-  function applyTrendingFilter(ideas) {
-    if (!state.trendingOnly) {
-      return ideas;
-    }
-    return ideas.filter((idea) => idea.isTrending);
-  }
-
-  function applyNewestFilter(ideas) {
-    if (!state.newestFirst) {
-      return ideas;
-    }
-    return sortIdeasNewestFirst(ideas);
   }
 
   function applyFavoritesSearchFilter(ideas) {
@@ -85,11 +63,58 @@ export default async function decorate(block) {
     });
   }
 
+  function applyCategoryFilter(ideas) {
+    if (!state.category || state.category === 'all') {
+      return ideas;
+    }
+    const cat = state.category.trim().toLowerCase();
+    return ideas.filter((idea) => {
+      if (!idea.category) return false;
+      return idea.category.trim().toLowerCase() === cat;
+    });
+  }
+
+  function applyTrendingFilter(ideas) {
+    if (!state.trendingOnly) {
+      return ideas;
+    }
+    return ideas.filter((idea) => idea.isTrending);
+  }
+
+  function applyNewestFilter(ideas) {
+    if (!state.newestFirst) {
+      return ideas;
+    }
+    return sortIdeasNewestFirst(ideas);
+  }
+
+  function applyRelatedFilter(ideas) {
+    if (!state.relatedOnly || !state.currentCategory) {
+      return ideas;
+    }
+    const cat = state.currentCategory.trim().toLowerCase();
+    const currentPath = window.location.pathname.replace(/\/$/, '');
+    return ideas.filter((idea) => {
+      if (!idea.category) return false;
+      const ideaCat = idea.category.trim().toLowerCase();
+      const sameCat = ideaCat === cat;
+      const sameId = state.currentIdeaId && idea.id === state.currentIdeaId;
+      const samePath =
+        idea.path &&
+        idea.path.replace(/\/$/, '') === currentPath;
+      return sameCat && !sameId && !samePath;
+    });
+  }
+
   async function gatherIdeas() {
     let ideas = await getBaseIdeas();
     ideas = applyFavoritesSearchFilter(ideas);
-    ideas = applyCategoryFilter(ideas);
-    ideas = applyTrendingFilter(ideas);
+    if (state.relatedOnly) {
+      ideas = applyRelatedFilter(ideas);
+    } else {
+      ideas = applyCategoryFilter(ideas);
+      ideas = applyTrendingFilter(ideas);
+    }
     ideas = applyNewestFilter(ideas);
     return ideas;
   }
@@ -106,6 +131,9 @@ export default async function decorate(block) {
       } else if (state.favoritesOnly) {
         title = 'No favorites yet';
         message = 'Save ideas you love and they will show up here.';
+      } else if (state.relatedOnly) {
+        title = 'No related ideas yet';
+        message = 'Add more ideas in this category to see related suggestions.';
       } else {
         title = 'No ideas yet';
         message = 'Content will appear here once ideas are published.';
@@ -136,5 +164,15 @@ export default async function decorate(block) {
     if (state.favoritesOnly) {
       render();
     }
+  });
+
+  window.addEventListener('pinspire:current-idea', (event) => {
+    if (!state.relatedOnly) {
+      return;
+    }
+    const detail = event.detail || {};
+    state.currentIdeaId = detail.id || '';
+    state.currentCategory = detail.category ? detail.category.trim().toLowerCase() : '';
+    render();
   });
 }

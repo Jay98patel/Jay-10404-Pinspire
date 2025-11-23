@@ -7,6 +7,7 @@ export function createIdeaCard(idea) {
   const description = safeIdea.description || '';
   const category = safeIdea.category || '';
   const image = safeIdea.image || '';
+  const path = safeIdea.path || '';
   const active = isFavorite(id);
 
   const card = document.createElement('article');
@@ -34,6 +35,13 @@ export function createIdeaCard(idea) {
     const nowActive = toggleFavorite(safeIdea);
     favButton.classList.toggle('is-active', nowActive);
   });
+
+  if (path) {
+    card.addEventListener('click', () => {
+      window.location.href = path;
+    });
+    card.style.cursor = 'pointer';
+  }
 
   return card;
 }
