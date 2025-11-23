@@ -15,6 +15,7 @@ indices:
       - '/favicon.ico'
       - '/404*'
     target: /query-index.json
+
     properties:
       path:
         select: path
@@ -35,9 +36,10 @@ indices:
           attribute(el, 'content')
 
       image:
-        select: main img
+        # take the OG image and strip the domain → "/icons/..."
+        select: head > meta[property="og:image"]
         value: |
-          match(attribute(el, 'src'), 'https:\/\/[^/]+(\/.*)')
+          match(attribute(el, 'content'), 'https:\/\/[^/]+(\/.*)')
 
       category:
         select: head > meta[name="category"]
