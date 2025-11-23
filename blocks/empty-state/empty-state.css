@@ -1,0 +1,26 @@
+.block.empty-state {
+  margin: 32px 0;
+}
+
+.pi-empty-state {
+  text-align: center;
+  padding: 40px 16px;
+  border-radius: var(--pi-radius-sm);
+  background-color: var(--pi-color-surface-muted);
+  color: var(--pi-color-text-muted);
+}
+
+.pi-empty-state-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.pi-empty-state-title {
+  font-size: var(--heading-font-size-s);
+  margin-bottom: 4px;
+  color: var(--pi-color-text-main);
+}
+
+.pi-empty-state-message {
+  font-size: var(--body-font-size-m);
+}

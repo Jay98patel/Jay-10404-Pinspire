@@ -1,0 +1,14 @@
+.block.section-header {
+  margin: 16px 0;
+}
+
+.block.section-header .pi-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.block.section-header .pi-section-header.pi-section-header--center {
+  text-align: center;
+  align-items: center;
+}

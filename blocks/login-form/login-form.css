@@ -1,0 +1,59 @@
+.block.login-form {
+  display: flex;
+  justify-content: center;
+  padding: 64px 16px;
+}
+
+.pi-login-form-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+.pi-login-form {
+  background-color: var(--pi-color-surface);
+  border-radius: var(--pi-radius-sm);
+  box-shadow: var(--pi-shadow-soft);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pi-login-title {
+  font-size: var(--heading-font-size-m);
+  margin: 0;
+}
+
+.pi-login-subtitle {
+  font-size: var(--body-font-size-s);
+  color: var(--pi-color-text-muted);
+  margin: 0;
+}
+
+.pi-login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--body-font-size-s);
+}
+
+.pi-login-field span {
+  color: var(--pi-color-text-muted);
+}
+
+.pi-login-field input {
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--pi-color-border-subtle);
+  outline: none;
+}
+
+.pi-login-field input:focus-visible {
+  border-color: var(--pi-color-primary);
+}
+
+.pi-login-submit {
+  margin-top: 8px;
+  width: 100%;
+  border-radius: 999px;
+}

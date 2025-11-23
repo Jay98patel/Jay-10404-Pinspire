@@ -1,0 +1,25 @@
+.block.idea-card {
+  margin: 16px 0;
+}
+
+.block.idea-card .pi-idea-card {
+  width: 100%;
+}
+
+.block.idea-card .pi-card-body {
+  padding: var(--pi-gap-sm);
+}
+
+.block.idea-card .pi-card-title {
+  margin-bottom: 4px;
+}
+
+.block.idea-card .pi-card-meta {
+  margin-bottom: 4px;
+}
+
+.block.idea-card .pi-card-description {
+  font-size: var(--body-font-size-s);
+  color: var(--pi-color-text-muted);
+  margin: 0;
+}
