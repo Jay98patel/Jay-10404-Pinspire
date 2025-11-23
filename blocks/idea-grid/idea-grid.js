@@ -9,7 +9,14 @@ import { createEmptyState } from '../empty-state/empty-state.js';
 import { requireAuth } from '../../scripts/pi-auth.js';
 
 export default async function decorate(block) {
-  const favoritesOnly = block.classList.contains('favorites-only');
+  const isFavoritesRoute =
+    typeof window !== 'undefined' &&
+    window.location &&
+    window.location.pathname.startsWith('/my-favorites');
+
+  const favoritesOnly =
+    block.classList.contains('favorites-only') || isFavoritesRoute;
+
   const relatedOnly = block.classList.contains('related');
 
   if (favoritesOnly) {
@@ -142,7 +149,6 @@ export default async function decorate(block) {
       container.append(empty);
       return;
     }
-    console.log('Rendering ideas:', ideas);
     ideas.forEach((idea) => {
       const card = createIdeaCard(idea);
       container.append(card);

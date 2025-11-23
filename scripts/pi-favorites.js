@@ -4,7 +4,7 @@ const FAVORITES_KEY = 'pinspire-favorites';
 
 function normalizeIdea(idea) {
   if (!idea) return null;
-  const id = String(idea.id || '').trim();
+  const id = String(idea.id || idea.path || '').trim();
   if (!id) return null;
   return {
     id,

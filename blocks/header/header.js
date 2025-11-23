@@ -91,43 +91,53 @@ export default async function decorate(block) {
   const right = document.createElement('div');
   right.className = 'pi-header-right';
 
-  const favLink = document.createElement('a');
-  favLink.href = '/my-favorites';
-  favLink.className = 'pi-header-icon-button pi-header-favorites';
-  favLink.setAttribute('aria-label', 'My favorites');
-  favLink.innerHTML = '❤';
+  function renderRight() {
+    right.innerHTML = '';
 
-  const userWrapper = document.createElement('div');
-  userWrapper.className = 'pi-header-user';
+    const favLink = document.createElement('a');
+    favLink.href = '/my-favorites';
+    favLink.className = 'pi-header-icon-button pi-header-favorites';
+    favLink.setAttribute('aria-label', 'My favorites');
+    favLink.innerHTML = '❤';
 
-  if (isAuthenticated()) {
-    const auth = getAuth();
-    const username = auth && auth.username ? String(auth.username) : '';
-    const initial = username ? username.charAt(0).toUpperCase() : 'U';
+    const userWrapper = document.createElement('div');
+    userWrapper.className = 'pi-header-user';
 
-    const avatar = document.createElement('div');
-    avatar.className = 'pi-header-avatar';
-    avatar.textContent = initial;
+    if (isAuthenticated()) {
+      const auth = getAuth();
+      const username = auth && auth.username ? String(auth.username) : '';
+      const initial = username ? username.charAt(0).toUpperCase() : 'U';
 
-    const logoutButton = document.createElement('button');
-    logoutButton.type = 'button';
-    logoutButton.className = 'pi-header-logout';
-    logoutButton.textContent = 'Log out';
-    logoutButton.addEventListener('click', (event) => {
-      event.preventDefault();
-      logout();
-    });
+      const avatar = document.createElement('div');
+      avatar.className = 'pi-header-avatar';
+      avatar.textContent = initial;
 
-    userWrapper.append(avatar, logoutButton);
-  } else {
-    const loginLink = document.createElement('a');
-    loginLink.href = '/login';
-    loginLink.className = 'pi-header-login';
-    loginLink.textContent = 'Log in';
-    userWrapper.append(loginLink);
+      const logoutButton = document.createElement('button');
+      logoutButton.type = 'button';
+      logoutButton.className = 'pi-header-logout';
+      logoutButton.textContent = 'Log out';
+      logoutButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        logout();
+      });
+
+      userWrapper.append(avatar, logoutButton);
+    } else {
+      const loginLink = document.createElement('a');
+      loginLink.href = '/login';
+      loginLink.className = 'pi-header-login';
+      loginLink.textContent = 'Log in';
+      userWrapper.append(loginLink);
+    }
+
+    right.append(favLink, userWrapper);
   }
 
-  right.append(favLink, userWrapper);
+  renderRight();
+
+  window.addEventListener('pinspire:auth-changed', () => {
+    renderRight();
+  });
 
   shell.append(left, center, right);
   block.append(shell);

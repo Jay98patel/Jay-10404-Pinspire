@@ -1,58 +1,84 @@
 .pi-idea-card {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--pi-color-surface);
-  border-radius: var(--pi-radius-card-lg);
-  box-shadow: var(--pi-shadow-soft);
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 16px;
+  border-radius: 18px;
   overflow: hidden;
+  background-color: var(--pi-color-surface, #ffffff);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+  break-inside: avoid;
 }
 
 .pi-idea-card-link {
-  display: flex;
-  flex-direction: column;
+  display: block;
+  height: 100%;
   text-decoration: none;
   color: inherit;
-  height: 100%;
 }
 
 .pi-idea-card-image-wrap {
   position: relative;
   width: 100%;
-  padding-top: 135%;
-  background-color: var(--pi-color-bg-subtle);
   overflow: hidden;
 }
 
 .pi-idea-card-image-wrap img {
-  position: absolute;
-  inset: 0;
+  display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
   object-fit: cover;
+  transition: transform 200ms ease-out;
+}
+
+.pi-idea-card:hover .pi-idea-card-image-wrap img {
+  transform: scale(1.03);
 }
 
 .pi-idea-card-fav {
   position: absolute;
+  top: 8px;
   right: 8px;
-  bottom: 8px;
-  border: none;
   border-radius: 999px;
   padding: 6px 10px;
-  background-color: #e60023;
-  color: #fff;
+  border: 1px solid #e60023;
+  background-color: rgba(255, 255, 255, 0.96);
+  color: #e60023;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition:
+    opacity 160ms ease-out,
+    transform 160ms ease-out,
+    background-color 160ms ease-out,
+    color 160ms ease-out,
+    filter 160ms ease-out;
 }
 
 .pi-idea-card-fav.is-active {
-  filter: brightness(0.9);
+  background-color: #e60023;
+  color: #ffffff;
+  border-color: #e60023;
+  filter: brightness(0.96);
 }
 
-.pi-idea-card-body {
-  padding: 10px 12px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.pi-idea-card-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 12px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+  color: #ffffff;
+  opacity: 0;
+  transform: translateY(20%);
+  transition: opacity 160ms ease-out, transform 160ms ease-out;
 }
 
 .pi-idea-card-title {
@@ -61,17 +87,9 @@
   font-weight: 600;
 }
 
-.pi-idea-card-description {
-  margin: 0;
-  font-size: var(--body-font-size-xs);
-  color: var(--pi-color-text-muted);
-}
-
-.pi-idea-card-category-pill {
-  margin-top: 4px;
-  align-self: flex-start;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background-color: var(--pi-color-chip-bg);
-  font-size: var(--body-font-size-xs);
+.pi-idea-card:hover .pi-idea-card-fav,
+.pi-idea-card:hover .pi-idea-card-overlay {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
