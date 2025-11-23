@@ -1,76 +1,89 @@
-const INDEX_URL = '/query-index.json';
+// scripts/pi-ideas-index.js
 
-let indexPromise = null;
+const IDEAS_INDEX_URL = '/pi-ideas-index.json';
 
-async function fetchIndex() {
-  if (!indexPromise) {
-    indexPromise = fetch(INDEX_URL)
-      .then((res) => (res.ok ? res.json() : { data: [] }))
-      .then((json) => (Array.isArray(json.data) ? json.data : []))
-      .catch(() => []);
+let ideasCache = null;
+
+/**
+ * Fetch raw data from the Helix ideas index
+ */
+async function fetchIdeasIndex() {
+  if (ideasCache) {
+    return ideasCache;
   }
-  return indexPromise;
+
+  const resp = await fetch(IDEAS_INDEX_URL);
+  if (!resp.ok) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to load ideas index:', IDEAS_INDEX_URL, resp.status);
+    ideasCache = [];
+    return ideasCache;
+  }
+
+  const json = await resp.json();
+  const rows = json.data || [];
+
+  ideasCache = rows.map((row) => normalizeIdea(row));
+  // eslint-disable-next-line no-console
+  console.log('Loaded ideas index:', ideasCache);
+  return ideasCache;
 }
 
-function normalizeTags(value) {
-  if (!value) return [];
-  if (Array.isArray(value)) return value;
-  return String(value)
-    .split(',')
-    .map((t) => t.trim())
-    .filter(Boolean);
-}
-
-function normalizeBoolean(value) {
-  if (!value) return false;
-  return String(value).toLowerCase() === 'true';
-}
-
-function mapIdea(row) {
-  const tags = normalizeTags(row.tags);
-  const createdAt = row.createdAt || '';
-  const isTrending = normalizeBoolean(row.isTrending);
-  const id = row.id || row.path || '';
-  return {
-    path: row.path || '',
-    id,
-    title: row.title || '',
-    description: row.description || '',
-    image: row.image || '',
-    category: row.category || '',
+/**
+ * Normalize a row from the index into a nice object
+ */
+function normalizeIdea(row) {
+  // index columns: path, title, description, image, category, tags, createdAt, isTrending, lastModified, id
+  const [
+    path,
+    title,
+    description,
+    image,
+    category,
     tags,
     createdAt,
     isTrending,
+    lastModified,
+    id,
+  ] = row;
+
+  const tagList = typeof tags === 'string'
+    ? tags.split(',').map((t) => t.trim()).filter(Boolean)
+    : [];
+
+  return {
+    id: id || path,
+    path,
+    title,
+    description,
+    image,
+    category,
+    tags: tagList,
+    createdAt: createdAt || '',
+    isTrending: String(isTrending).toLowerCase() === 'true',
+    lastModified: lastModified || '',
   };
 }
 
+/**
+ * Public API used by idea-grid / idea-detail
+ */
+
 export async function loadIdeas() {
-  const rows = await fetchIndex();
-  return rows
-    .filter((row) => row.path && row.path !== '/404')
-    .map(mapIdea);
+  return fetchIdeasIndex();
 }
 
 export async function searchIdeasByTitle(query) {
+  const all = await fetchIdeasIndex();
   const q = (query || '').trim().toLowerCase();
-  if (!q) {
-    return loadIdeas();
-  }
-  const ideas = await loadIdeas();
-  return ideas.filter((idea) => {
-    const title = (idea.title || '').toLowerCase();
-    const desc = (idea.description || '').toLowerCase();
-    const tags = (idea.tags || []).join(' ').toLowerCase();
-    return title.includes(q) || desc.includes(q) || tags.includes(q);
-  });
+  if (!q) return all;
+  return all.filter((idea) => (idea.title || '').toLowerCase().includes(q));
 }
 
 export function sortIdeasNewestFirst(ideas) {
-  const copy = [...ideas];
-  copy.sort((a, b) => {
-    const ta = Date.parse(a.createdAt || '') || 0;
-    const tb = Date.parse(b.createdAt || '') || 0;
-    return tb - ta;
+  return [...ideas].sort((a, b) => {
+    const da = Date.parse(a.createdAt || '') || 0;
+    const db = Date.parse(b.createdAt || '') || 0;
+    return db - da;
   });
-  return copy;
 }

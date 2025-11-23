@@ -1,7 +1,8 @@
 version: 1
 
 indices:
-  ideas:
+  pi-ideas:
+    # Only index idea detail pages under /ideas/
     include:
       - '/ideas/**'
     exclude:
@@ -11,11 +12,12 @@ indices:
       - '/scripts/**'
       - '/blocks/**'
       - '/tools/**'
-      - '/query-index/**'
       - '/metadata/**'
       - '/favicon.ico'
       - '/404*'
-    target: /query-index.json
+    # IMPORTANT: use a different target than /query-index.json
+    target: /pi-ideas-index.json
+
     properties:
       path:
         select: path
