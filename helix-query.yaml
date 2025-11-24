@@ -17,9 +17,6 @@ indices:
     target: /query-index.json
 
     properties:
-      path:
-        select: path
-
       id:
         select: head > meta[name="id"]
         value: |

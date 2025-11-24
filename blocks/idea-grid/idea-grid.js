@@ -19,6 +19,27 @@ function ensureIdeaCardStyles() {
   document.head.appendChild(link);
 }
 
+/**
+ * Keep only real idea pages:
+ * - must have a path
+ * - path must start with /ideas/
+ * - title must not be the section-metadata template
+ */
+function filterRealIdeas(ideas) {
+  if (!Array.isArray(ideas)) return [];
+  return ideas.filter((idea) => {
+    if (!idea) return false;
+
+    const path = (idea.path || '').trim();
+    if (!path || !path.startsWith('/ideas/')) return false;
+
+    const title = (idea.title || '').trim().toLowerCase();
+    if (title.startsWith('section-metadata')) return false;
+
+    return true;
+  });
+}
+
 export default async function decorate(block) {
   ensureIdeaCardStyles();
 
@@ -56,13 +77,19 @@ export default async function decorate(block) {
   };
 
   async function getBaseIdeas() {
+    let ideas;
+
     if (state.favoritesOnly) {
-      return getFavoritesList();
+      // favorites are already normalized idea objects
+      ideas = getFavoritesList();
+    } else if (state.query && !state.relatedOnly) {
+      ideas = searchIdeasByTitle(state.query);
+    } else {
+      ideas = await loadIdeas();
     }
-    if (state.query && !state.relatedOnly) {
-      return searchIdeasByTitle(state.query);
-    }
-    return loadIdeas();
+
+    // 🚫 strip out "/", "/login", "/my-favorites", "/404", etc.
+    return filterRealIdeas(ideas);
   }
 
   function applyFavoritesSearchFilter(ideas) {
@@ -173,8 +200,7 @@ export default async function decorate(block) {
     render();
   });
 
-  // Category chips should ONLY affect the "Browse by category" grid.
-  // That grid’s idea-grid-wrapper comes right after .category-pills-wrapper.
+  // Category chips are already scoped via your previous logic (Browse by category only)
   const wrapper = block.closest('.idea-grid-wrapper');
   const prevSibling = wrapper ? wrapper.previousElementSibling : null;
   const isBrowseByCategoryGrid =
