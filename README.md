@@ -12,6 +12,17 @@ It lets users browse curated ideas, filter by categories, and save their favorit
 
 ---
 
+## Demo Login Credentials
+
+To access features that require authentication (e.g. **My favorites**):
+
+- **Username**: _anything_ (any non-empty value)  
+- **Password**: `pinspire123`
+
+> The backend accepts any username as long as the password matches `pinspire123`.
+
+---
+
 ## Features
 
 - Pinterest-style masonry grid for ideas
