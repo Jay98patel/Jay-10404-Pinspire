@@ -1,34 +1,48 @@
-# Your Project's Title...
-Your project's description...
+# Pinspire – Pinterest-style Ideas Explorer
+
+Pinspire is a Pinterest-inspired ideas board built on **AEM Edge Delivery Services**.  
+It lets users browse curated ideas, filter by categories, and save their favorites in a clean, responsive UI.
+
+---
 
 ## Environments
-- Preview: https://main--Jay-10404-Pinspire--Jay98patel.aem.page/
-- Live: https://main--Jay-10404-Pinspire--Jay98patel.aem.live/
+
+- **Preview**: https://main--Jay-10404-Pinspire--Jay98patel.aem.page/  
+- **Live**: https://main--Jay-10404-Pinspire--Jay98patel.aem.live/
+
+---
+
+## Features
+
+- Pinterest-style masonry grid for ideas
+- Browse by category using interactive chips
+- “My favorites” page with login-gated saved ideas
+- AEM EDS blocks for header, footer, idea grid, category pills, etc.
+- Responsive layout tuned for desktop and mobile
+
+---
+
+## Tech Stack
+
+- **AEM Edge Delivery Services / Franklin**
+- **Vanilla JS, HTML, CSS**
+- **Node.js + npm** (tooling, linting)
+- AEM **blocks** and **fragments** for reusable content
+
+---
 
 ## Documentation
 
-Before using the aem-boilerplate, we recommand you to go through the documentation on https://www.aem.live/docs/ and more specifically:
-1. [Developer Tutorial](https://www.aem.live/developer/tutorial)
-2. [The Anatomy of a Project](https://www.aem.live/developer/anatomy-of-a-project)
-3. [Web Performance](https://www.aem.live/developer/keeping-it-100)
+Before extending this project, it’s recommended to review the AEM documentation:
+
+1. [Developer Tutorial](https://www.aem.live/developer/tutorial)  
+2. [The Anatomy of a Project](https://www.aem.live/developer/anatomy-of-a-project)  
+3. [Web Performance](https://www.aem.live/developer/keeping-it-100)  
 4. [Markup, Sections, Blocks, and Auto Blocking](https://www.aem.live/developer/markup-sections-blocks)
+
+---
 
 ## Installation
 
 ```sh
 npm i
-```
-
-## Linting
-
-```sh
-npm run lint
-```
-
-## Local development
-
-1. Create a new repository based on the `aem-boilerplate` template
-1. Add the [AEM Code Sync GitHub App](https://github.com/apps/aem-code-sync) to the repository
-1. Install the [AEM CLI](https://github.com/adobe/helix-cli): `npm install -g @adobe/aem-cli`
-1. Start AEM Proxy: `aem up` (opens your browser at `http://localhost:3000`)
-1. Open the `Jay-10404-Pinspire` directory in your favorite IDE and start coding :)
