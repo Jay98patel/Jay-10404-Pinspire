@@ -1,38 +1,38 @@
 .idea-grid.block {
-  margin-top: 24px; /* space below “Browse by category” */
+  margin-top: 16px;
 }
 
 /* Pinterest-style masonry columns */
 .idea-grid.block .pi-idea-grid-inner {
-  column-count: 5;
-  column-gap: 20px;
-}
-
-@media (max-width: 1400px) {
-  .idea-grid.block .pi-idea-grid-inner {
-    column-count: 4;
-  }
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 
 @media (max-width: 1100px) {
   .idea-grid.block .pi-idea-grid-inner {
-    column-count: 3;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 800px) {
   .idea-grid.block .pi-idea-grid-inner {
-    column-count: 2;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 520px) {
   .idea-grid.block .pi-idea-grid-inner {
-    column-count: 1;
+    grid-template-columns: repeat(1, 1fr);
   }
 }
+
 /* Center the empty state nicely inside any idea-grid */
 .idea-grid.block .pi-idea-grid-inner .pi-empty-state {
   max-width: 440px;
   margin: 40px auto 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }

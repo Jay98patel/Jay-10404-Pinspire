@@ -146,8 +146,14 @@
   font-weight: 500;
 }
 
-@media (width <= 600px) {
-  .header.block .pi-header-explore {
+@media (width <=600px) {
+
+  .header.block .pi-header-explore,
+  .header.block .pi-header-center {
     display: none;
+  }
+
+  .header.block .pi-header-right {
+    margin-left: auto;
   }
 }

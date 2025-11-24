@@ -3,7 +3,7 @@
   position: relative;
   display: inline-block;
   width: 100%;
-  margin: 0 0 18px;
+  margin: 0;
   border-radius: 18px;
   overflow: hidden;
   background-color: var(--pi-color-surface, #ffffff);
@@ -63,16 +63,30 @@
     color 160ms ease-out;
 }
 
+.pi-idea-card .pi-idea-card-fav:hover {
+  background-color: #ffcad1;
+}
+
+.pi-idea-card-fav.is-active,
+.pi-idea-card:hover .pi-idea-card-fav.is-active {
+  background-color: #e60023;
+  border-color: #e60023;
+  color: #ffffff;
+}
+
+.pi-idea-card:hover .pi-idea-card-fav::before {
+  color: #e60023;
+}
+
+.pi-idea-card:hover .pi-idea-card-fav.is-active::before {
+  color: #ffffff;
+}
+
 .pi-idea-card-fav::before {
   content: '♡';
   font-size: 18px;
   line-height: 1;
   color: #e60023;
-}
-
-.pi-idea-card-fav.is-active {
-  background-color: #e60023;
-  border-color: #e60023;
 }
 
 .pi-idea-card-fav.is-active::before {
@@ -87,11 +101,9 @@
   right: 0;
   bottom: 0;
   padding: 8px 10px;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.7),
-    rgba(0, 0, 0, 0)
-  );
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.7),
+      rgba(0, 0, 0, 0));
   color: #ffffff;
   opacity: 0;
   transform: translateY(18%);

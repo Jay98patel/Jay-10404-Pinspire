@@ -17,7 +17,7 @@ function sampleRUM(checkpoint, data) {
   try {
     window.hlx = window.hlx || {};
     if (!window.hlx.rum || !window.hlx.rum.collector) {
-      sampleRUM.enhance = () => {};
+      sampleRUM.enhance = () => { };
       const params = new URLSearchParams(window.location.search);
       const { currentScript } = document;
       const rate = params.get('rum')
@@ -175,7 +175,18 @@ function init() {
   setup();
   sampleRUM.collectBaseURL = window.origin;
   sampleRUM();
+
+  // Page title logic
+  try {
+    const current = document.title || '';
+    if (current.toLowerCase().startsWith('section-metadata')) {
+      document.title = 'Pinterest';
+    }
+  } catch (e) {
+    console.log('Title Errors', e);
+  }
 }
+
 
 /**
  * Sanitizes a string for use as class name.

@@ -51,6 +51,9 @@ export function createSearchBar(onQueryChanged) {
 
 export default async function decorate(block) {
   const navMeta = getMetadata('nav');
+  const brandLogoMeta = getMetadata('brand-logo');
+  const brandLogoPath = brandLogoMeta || '../../images/brand-logo.png';
+
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
   const fragment = await loadFragment(navPath);
   const navSource = fragment || document.createElement('div');
@@ -75,6 +78,19 @@ export default async function decorate(block) {
     logoSpan.className = 'pi-header-logo-fallback';
     logoSpan.textContent = 'P';
     logoLink.append(logoSpan);
+  }
+
+  if (brandLogoPath && typeof Image !== 'undefined') {
+    const img = document.createElement('img');
+    img.alt = 'Pinspire';
+    img.addEventListener('load', () => {
+      logoLink.innerHTML = '';
+      logoLink.append(img);
+    });
+    img.addEventListener('error', () => {
+      // fallback
+    });
+    img.src = brandLogoPath;
   }
 
   const exploreLabel = document.createElement('span');

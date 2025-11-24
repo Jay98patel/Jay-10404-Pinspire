@@ -1,11 +1,13 @@
 .section-header.block {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+  margin-top: 16px;
 }
 
 .section-header.block .pi-section-header-inner {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-top: 20px;
 }
 
 .section-header.block .pi-section-title {
