@@ -19,12 +19,6 @@ function ensureIdeaCardStyles() {
   document.head.appendChild(link);
 }
 
-/**
- * Keep only real idea pages:
- * - must have a path
- * - path must start with /ideas/
- * - title must not be the section-metadata template
- */
 function filterRealIdeas(ideas) {
   if (!Array.isArray(ideas)) return [];
   return ideas.filter((idea) => {
@@ -80,16 +74,13 @@ export default async function decorate(block) {
     let ideas;
 
     if (state.favoritesOnly) {
-      // favorites are already normalized idea objects
       ideas = getFavoritesList();
     } else if (state.query && !state.relatedOnly) {
-      // 🔑 THIS MUST BE AWAITED
       ideas = await searchIdeasByTitle(state.query);
     } else {
       ideas = await loadIdeas();
     }
 
-    // strip "/", "/login", "/my-favorites", "/404", and section-metadata rows
     return filterRealIdeas(ideas);
   }
 
@@ -195,13 +186,11 @@ export default async function decorate(block) {
 
   render();
 
-  // Search filters ALL grids
   window.addEventListener('pinspire:search', (event) => {
     state.query = event.detail && event.detail.query ? event.detail.query : '';
     render();
   });
 
-  // Category chips are already scoped via your previous logic (Browse by category only)
   const wrapper = block.closest('.idea-grid-wrapper');
   const prevSibling = wrapper ? wrapper.previousElementSibling : null;
   const isBrowseByCategoryGrid =
