@@ -1,63 +1,52 @@
-version: 1
-
 indices:
   ideas:
     include:
       - '/ideas/**'
-    exclude:
-      - '/icons/**'
-      - '/fonts/**'
-      - '/styles/**'
-      - '/scripts/**'
-      - '/blocks/**'
-      - '/tools/**'
-      - '/metadata/**'
-      - '/favicon.ico'
-      - '/404*'
-    target: /query-index.json
-
+    target: '/query-index.json'
     properties:
+      path:
+        value: path
+
       id:
-        selectFirst: head > meta[name="id"]
-        value: |
-          attribute(el, 'content')
+        # <meta name="id" content="idea-strength-training">
+        selectFirst: head meta[name="id"]
+        value: attribute(el, 'content')
 
       title:
-        selectFirst: head > meta[property="og:title"]
-        value: |
-          attribute(el, 'content')
+        # <meta property="og:title" content="Start strength training">
+        selectFirst: head meta[property="og:title"]
+        value: attribute(el, 'content')
 
       description:
-        selectFirst: head > meta[name="description"]
-        value: |
-          attribute(el, 'content')
+        # <meta name="description" content="Begin a simple ... Test 22">
+        selectFirst: head meta[name="description"]
+        value: attribute(el, 'content')
 
       image:
-        selectFirst: head > meta[property="og:image"]
-        value: |
-          match(attribute(el, 'content'), 'https:\/\/[^/]+(\/.*)')
+        # <meta property="og:image" ...>
+        selectFirst: head meta[property="og:image"]
+        value: attribute(el, 'content')
 
       category:
-        selectFirst: head > meta[name="category"]
-        value: |
-          attribute(el, 'content')
+        # <meta name="category" content="Health">
+        selectFirst: head meta[name="category"]
+        value: attribute(el, 'content')
 
       tags:
-        select: head > meta[property="article:tag"]
-        value: |
-          attribute(el, 'content')
+        # multiple <meta property="article:tag" content="fitness"> etc.
+        select: head meta[property="article:tag"]
+        values: attribute(el, 'content')
 
       createdAt:
-        selectFirst: head > meta[name="createdat"], head > meta[name="createdAt"]
-        value: |
-          attribute(el, 'content')
+        # you currently have name="createdat" (lowercase) in real meta
+        selectFirst: head meta[name="createdat"], head meta[name="createdAt"]
+        value: attribute(el, 'content')
 
       isTrending:
-        selectFirst: head > meta[name="istrending"], head > meta[name="isTrending"]
-        value: |
-          attribute(el, 'content')
+        # name="istrending" or "isTrending"
+        selectFirst: head meta[name="istrending"], head meta[name="isTrending"]
+        value: attribute(el, 'content')
 
       lastModified:
-        selectFirst: none
-        value: |
-          parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
+        # built-in last modified date from EDS
+        value: lastmodified

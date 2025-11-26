@@ -43,7 +43,6 @@ function normalizeIdea(row) {
     lastModified = '',
   } = row;
 
-  // Only use real ideas (under /ideas/)
   if (!path || !path.startsWith('/ideas/')) return null;
 
   const trending =
@@ -58,7 +57,7 @@ function normalizeIdea(row) {
     id: id || path.replace(/^\/+/, '').replace(/\//g, '-'),
     title,
     description,
-    image, // e.g. "/icons/pinspire-og-sunset-hike.png"
+    image,
     category,
     tags: normalizeTags(tags),
     createdAt,
@@ -66,6 +65,7 @@ function normalizeIdea(row) {
     lastModified: lm,
   };
 }
+
 
 export async function loadIdeas() {
   if (ideasCache) return ideasCache;
