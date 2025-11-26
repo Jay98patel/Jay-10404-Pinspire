@@ -76,22 +76,22 @@ export default async function decorate(block) {
     currentCategory: '',
   };
 
- async function getBaseIdeas() {
-  let ideas;
+  async function getBaseIdeas() {
+    let ideas;
 
-  if (state.favoritesOnly) {
-    // favorites are already normalized idea objects
-    ideas = getFavoritesList();
-  } else if (state.query && !state.relatedOnly) {
-    // 🔑 THIS MUST BE AWAITED
-    ideas = await searchIdeasByTitle(state.query);
-  } else {
-    ideas = await loadIdeas();
+    if (state.favoritesOnly) {
+      // favorites are already normalized idea objects
+      ideas = getFavoritesList();
+    } else if (state.query && !state.relatedOnly) {
+      // 🔑 THIS MUST BE AWAITED
+      ideas = await searchIdeasByTitle(state.query);
+    } else {
+      ideas = await loadIdeas();
+    }
+
+    // strip "/", "/login", "/my-favorites", "/404", and section-metadata rows
+    return filterRealIdeas(ideas);
   }
-
-  // strip "/", "/login", "/my-favorites", "/404", and section-metadata rows
-  return filterRealIdeas(ideas);
-}
 
   function applyFavoritesSearchFilter(ideas) {
     if (!state.favoritesOnly || !state.query) {
@@ -187,8 +187,8 @@ export default async function decorate(block) {
       return;
     }
 
-    ideas.forEach((idea) => {
-      const card = createIdeaCard(idea);
+    ideas.forEach((idea, index) => {
+      const card = createIdeaCard(idea, index === 0);
       container.append(card);
     });
   }

@@ -1,7 +1,7 @@
 import { toggleFavorite, isFavorite } from '../../scripts/pi-favorites.js';
 import { isAuthenticated, openLoginModal } from '../../scripts/pi-auth.js';
 
-export function createIdeaCard(idea) {
+export function createIdeaCard(idea, isEager = false) {
   const rawId = idea.id || idea.path || '';
   const id = String(rawId).trim();
   const path = idea.path || '#';
@@ -25,6 +25,12 @@ export function createIdeaCard(idea) {
       </div>
     </a>
   `;
+
+  const img = card.querySelector('img');
+  if (img) {
+    img.loading = isEager ? 'eager' : 'lazy';
+    img.decoding = 'async';
+  }
 
   const favButton = card.querySelector('.pi-idea-card-fav');
 

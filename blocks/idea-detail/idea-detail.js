@@ -5,7 +5,7 @@ import { createEmptyState } from '../empty-state/empty-state.js';
 export default async function decorate(block) {
   const ideas = await loadIdeas();
   const currentPath = window.location.pathname.replace(/\/$/, '');
-  let currentIdea = ideas.find((idea) => {
+  const currentIdea = ideas.find((idea) => {
     const path = (idea.path || '').replace(/\/$/, '');
     return path === currentPath;
   });
@@ -41,6 +41,11 @@ export default async function decorate(block) {
       </div>
     </div>
   `;
+
+  const img = wrapper.querySelector('.pi-idea-detail-image img');
+  if (img) {
+    img.decoding = 'async';
+  }
 
   block.textContent = '';
   block.append(wrapper);
