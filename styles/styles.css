@@ -87,7 +87,7 @@
   src: local('Arial');
 }
 
-@media (width >= 900px) {
+@media (width >=900px) {
   :root {
     --body-font-size-m: 18px;
     --body-font-size-s: 16px;
@@ -113,6 +113,14 @@ body {
 
 body {
   min-height: 100vh;
+}
+
+body:not(.appear) main {
+  visibility: hidden;
+}
+
+body.appear main {
+  visibility: visible;
 }
 
 .pi-page {
@@ -272,13 +280,13 @@ pre {
   margin-bottom: var(--pi-gap-md);
 }
 
-@media (width >= 768px) {
+@media (width >=768px) {
   .pi-masonry {
     column-count: 3;
   }
 }
 
-@media (width >= 1200px) {
+@media (width >=1200px) {
   .pi-masonry {
     column-count: 4;
   }
@@ -371,7 +379,7 @@ pre {
   background-color: rgba(255, 255, 255, 1);
 }
 
-main > div {
+main>div {
   margin: 40px 16px;
 }
 
@@ -454,22 +462,22 @@ main img {
   width: 100%;
 }
 
-main > .section {
+main>.section {
   margin: 40px 0;
 }
 
-main > .section > div {
+main>.section>div {
   max-width: 1200px;
   margin: auto;
   padding: 0 24px;
 }
 
-main > .section:first-of-type {
+main>.section:first-of-type {
   margin-top: 0;
 }
 
-@media (width >= 900px) {
-  main > .section > div {
+@media (width >=900px) {
+  main>.section>div {
     padding: 0 32px;
   }
 }

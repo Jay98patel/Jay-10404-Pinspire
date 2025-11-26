@@ -14,15 +14,61 @@ function debounce(fn, delay) {
   };
 }
 
-export function createSearchBar(onQueryChanged) {
+function parseNavConfig(navSource) {
+  const defaults = {
+    exploreLabel: 'Explore',
+    searchPlaceholder: 'Search ideas…',
+    favoritesHref: '/my-favorites',
+    favoritesLabel: 'My favorites',
+    loginLabel: 'Log in',
+    logoutLabel: 'Log out',
+    brandLogo: '',
+  };
+
+  if (!navSource) return defaults;
+
+  const section = navSource.querySelector('.section');
+  if (!section || !section.dataset) return defaults;
+
+  const { dataset } = section;
+
+  return {
+    exploreLabel: dataset.exploreLabel || defaults.exploreLabel,
+    searchPlaceholder: dataset.searchPlaceholder || defaults.searchPlaceholder,
+    favoritesHref: dataset.favoritesHref || defaults.favoritesHref,
+    favoritesLabel: dataset.favoritesLabel || defaults.favoritesLabel,
+    loginLabel: dataset.loginLabel || defaults.loginLabel,
+    logoutLabel: dataset.logoutLabel || defaults.logoutLabel,
+    brandLogo: dataset.brandLogo || defaults.brandLogo,
+  };
+}
+
+export function createSearchBar(options = {}) {
+  let onQueryChanged;
+  let placeholder;
+
+  if (typeof options === 'function') {
+    onQueryChanged = options;
+  } else if (options && typeof options === 'object') {
+    onQueryChanged = options.onQueryChanged;
+    placeholder = options.placeholder;
+  }
+
+  const searchPlaceholder = placeholder || 'Search ideas…';
+
   const wrapper = document.createElement('div');
   wrapper.className = 'pi-search';
   wrapper.innerHTML = `
     <form class="pi-search-form" role="search">
       <span class="pi-search-icon" aria-hidden="true">🔍</span>
-      <input class="pi-search-input" type="search" placeholder="Search ideas…" aria-label="Search ideas" />
+      <input
+        class="pi-search-input"
+        type="search"
+        placeholder="${searchPlaceholder}"
+        aria-label="${searchPlaceholder}" />
     </form>
   `;
+
   const form = wrapper.querySelector('form');
   const input = wrapper.querySelector('input');
 
@@ -51,13 +97,15 @@ export function createSearchBar(onQueryChanged) {
 
 export default async function decorate(block) {
   const navMeta = getMetadata('nav');
-  const brandLogoMeta = getMetadata('brand-logo');
-  const brandLogoPath = brandLogoMeta || '../../images/brand-logo.png';
-
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
   const fragment = await loadFragment(navPath);
   const navSource = fragment || document.createElement('div');
   const logoPicture = navSource.querySelector('picture');
+
+  const navConfig = parseNavConfig(navSource);
+
+  const brandLogoMeta = getMetadata('brand-logo');
+  const brandLogoPath = navConfig.brandLogo || brandLogoMeta || '../../images/brand-logo.png';
 
   block.textContent = '';
 
@@ -88,32 +136,40 @@ export default async function decorate(block) {
       logoLink.append(img);
     });
     img.addEventListener('error', () => {
-      // fallback
     });
     img.src = brandLogoPath;
   }
 
   const exploreLabel = document.createElement('span');
   exploreLabel.className = 'pi-header-explore';
-  exploreLabel.textContent = 'Explore';
-
+  exploreLabel.textContent = navConfig.exploreLabel;
   left.append(logoLink, exploreLabel);
 
   const center = document.createElement('div');
   center.className = 'pi-header-center';
-  const search = createSearchBar();
-  center.append(search);
+  const searchHost = document.createElement('div');
+  center.append(searchHost);
 
   const right = document.createElement('div');
   right.className = 'pi-header-right';
+
+  function renderSearch() {
+    searchHost.innerHTML = '';
+    if (!isAuthenticated()) return;
+
+    const search = createSearchBar({
+      placeholder: navConfig.searchPlaceholder,
+    });
+    searchHost.append(search);
+  }
 
   function renderRight() {
     right.innerHTML = '';
 
     const favLink = document.createElement('a');
-    favLink.href = '/my-favorites';
+    favLink.href = navConfig.favoritesHref;
     favLink.className = 'pi-header-icon-button pi-header-favorites';
-    favLink.setAttribute('aria-label', 'My favorites');
+    favLink.setAttribute('aria-label', navConfig.favoritesLabel);
     favLink.innerHTML = '❤';
 
     const userWrapper = document.createElement('div');
@@ -131,7 +187,7 @@ export default async function decorate(block) {
       const logoutButton = document.createElement('button');
       logoutButton.type = 'button';
       logoutButton.className = 'pi-header-logout';
-      logoutButton.textContent = 'Log out';
+      logoutButton.textContent = navConfig.logoutLabel;
       logoutButton.addEventListener('click', (event) => {
         event.preventDefault();
         logout();
@@ -142,16 +198,18 @@ export default async function decorate(block) {
       const loginLink = document.createElement('a');
       loginLink.href = '/login';
       loginLink.className = 'pi-header-login';
-      loginLink.textContent = 'Log in';
+      loginLink.textContent = navConfig.loginLabel;
       userWrapper.append(loginLink);
     }
 
     right.append(favLink, userWrapper);
   }
 
+  renderSearch();
   renderRight();
 
   window.addEventListener('pinspire:auth-changed', () => {
+    renderSearch();
     renderRight();
   });
 
