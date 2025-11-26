@@ -18,47 +18,46 @@ indices:
 
     properties:
       id:
-        select: head > meta[name="id"]
+        selectFirst: head > meta[name="id"]
         value: |
           attribute(el, 'content')
 
       title:
-        select: head > meta[property="og:title"]
+        selectFirst: head > meta[property="og:title"]
         value: |
           attribute(el, 'content')
 
       description:
-        select: head > meta[name="description"]
+        selectFirst: head > meta[name="description"]
         value: |
           attribute(el, 'content')
 
       image:
-        # take the OG image and strip the domain → "/icons/..."
-        select: head > meta[property="og:image"]
+        selectFirst: head > meta[property="og:image"]
         value: |
           match(attribute(el, 'content'), 'https:\/\/[^/]+(\/.*)')
 
       category:
-        select: head > meta[name="category"]
+        selectFirst: head > meta[name="category"]
         value: |
           attribute(el, 'content')
 
       tags:
-        select: head > meta[name="article:tag"]
+        select: head > meta[property="article:tag"]
         value: |
           attribute(el, 'content')
 
       createdAt:
-        select: head > meta[name="createdAt"]
+        selectFirst: head > meta[name="createdat"], head > meta[name="createdAt"]
         value: |
           attribute(el, 'content')
 
       isTrending:
-        select: head > meta[name="isTrending"]
+        selectFirst: head > meta[name="istrending"], head > meta[name="isTrending"]
         value: |
           attribute(el, 'content')
 
       lastModified:
-        select: none
+        selectFirst: none
         value: |
           parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
