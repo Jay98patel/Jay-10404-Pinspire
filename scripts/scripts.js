@@ -29,7 +29,33 @@ async function loadFonts() {
     if (!window.location.hostname.includes('localhost')) {
       sessionStorage.setItem('fonts-loaded', 'true');
     }
-  } catch (e) {
+  } catch {
+  }
+}
+
+function preloadIdeasIndex() {
+  try {
+    const doc = document;
+    if (!doc) return;
+    const existing = doc.querySelector('link[data-preload="ideas-index"]');
+    if (!existing) {
+      const link = doc.createElement('link');
+      link.rel = 'preload';
+      link.href = '/query-index.json';
+      link.as = 'fetch';
+      link.type = 'application/json';
+      link.crossOrigin = 'anonymous';
+      link.dataset.preload = 'ideas-index';
+      doc.head.appendChild(link);
+    }
+    import('./pi-ideas-index.js')
+      .then((mod) => {
+        if (mod && typeof mod.loadIdeas === 'function') {
+          mod.loadIdeas().catch(() => {});
+        }
+      })
+      .catch(() => {});
+  } catch {
   }
 }
 
@@ -49,7 +75,6 @@ function buildAutoBlocks(main) {
         });
       });
     }
-
     buildHeroBlock(main);
   } catch (error) {
     console.error('Auto Blocking failed', error);
@@ -64,21 +89,6 @@ export function decorateMain(main) {
   decorateBlocks(main);
 }
 
-function preloadIdeasIndex() {
-  try {
-    const head = document.head || document.getElementsByTagName('head')[0];
-    if (!head || head.querySelector('link[data-preload="ideas-index"]')) return;
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'fetch';
-    link.href = '/query-index.json';
-    link.crossOrigin = 'anonymous';
-    link.dataset.preload = 'ideas-index';
-    head.appendChild(link);
-  } catch (e) {
-  }
-}
-
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
@@ -89,26 +99,24 @@ async function loadEager(doc) {
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }
-
   try {
     if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
       loadFonts();
     }
-  } catch (e) {
+  } catch {
   }
 }
 
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
   await loadSections(main);
-
   const { hash } = window.location;
-  const element = hash ? doc.getElementById(hash.substring(1)) : false;
-  if (hash && element) element.scrollIntoView();
-
+  const element = hash ? doc.getElementById(hash.substring(1)) : null;
+  if (hash && element) {
+    element.scrollIntoView();
+  }
   loadHeader(doc.querySelector('header'));
   loadFooter(doc.querySelector('footer'));
-
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
 }
