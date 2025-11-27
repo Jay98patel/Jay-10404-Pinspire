@@ -87,7 +87,7 @@
   src: local('Arial');
 }
 
-@media (width >=900px) {
+@media only screen and (min-width: 900px) {
   :root {
     --body-font-size-m: 18px;
     --body-font-size-s: 16px;
@@ -280,13 +280,13 @@ pre {
   margin-bottom: var(--pi-gap-md);
 }
 
-@media (width >=768px) {
+@media only screen and (min-width: 768px) {
   .pi-masonry {
     column-count: 3;
   }
 }
 
-@media (width >=1200px) {
+@media only screen and (min-width: 1200px) {
   .pi-masonry {
     column-count: 4;
   }
@@ -476,7 +476,7 @@ main>.section:first-of-type {
   margin-top: 0;
 }
 
-@media (width >=900px) {
+@media only screen and (min-width: 900px) {
   main>.section>div {
     padding: 0 32px;
   }

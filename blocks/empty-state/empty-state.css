@@ -56,7 +56,7 @@
 }
 
 /* Slightly bigger on desktop so the area under “What’s new” feels premium */
-@media (min-width: 960px) {
+@media only screen and (min-width: 960px) {
   .pi-empty-state {
     padding: 48px 40px;
     border-radius: 32px;

@@ -124,7 +124,7 @@ function ensureModalStyles(doc) {
       font-size: 18px;
       line-height: 1;
     }
-    @media (max-width: 600px) {
+    @media only screen and (max-width: 600px) {
       .pi-login-modal {
         margin: 0 16px;
       }

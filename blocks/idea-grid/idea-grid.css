@@ -2,32 +2,33 @@
   margin-top: 16px;
 }
 
-/* Pinterest-style masonry columns */
 .idea-grid.block .pi-idea-grid-inner {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
-@media (max-width: 1100px) {
+/* <= 1100px: 3 cards */
+@media only screen and  (max-width: 1100px) {
   .idea-grid.block .pi-idea-grid-inner {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-@media (max-width: 800px) {
+/* <= 800px: 2 cards */
+@media only screen and (max-width: 800px) {
   .idea-grid.block .pi-idea-grid-inner {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 520px) {
+/* <= 520px (phones): 1 card */
+@media only screen and (max-width: 520px) {
   .idea-grid.block .pi-idea-grid-inner {
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: 1fr;
   }
 }
 
-/* Center the empty state nicely inside any idea-grid */
 .idea-grid.block .pi-idea-grid-inner .pi-empty-state {
   max-width: 440px;
   margin: 40px auto 56px;
