@@ -2,6 +2,9 @@ import { loadIdeas } from '../../scripts/pi-ideas-index.js';
 import { toggleFavorite, isFavorite } from '../../scripts/pi-favorites.js';
 import { createEmptyState } from '../empty-state/empty-state.js';
 
+const DETAIL_IMG_WIDTH = 800;
+const DETAIL_IMG_HEIGHT = 1000;
+
 export default async function decorate(block) {
   const ideas = await loadIdeas();
   const currentPath = window.location.pathname.replace(/\/$/, '');
@@ -26,10 +29,18 @@ export default async function decorate(block) {
   wrapper.className = 'pi-idea-detail-card';
   wrapper.dataset.id = currentIdea.id || '';
 
+  const imgSrc = currentIdea.image || '/default-meta-image.png';
+  const imgAlt = currentIdea.title || '';
+
   wrapper.innerHTML = `
     <div class="pi-idea-detail-main">
       <div class="pi-idea-detail-image">
-        <img src="${currentIdea.image || '/default-meta-image.png'}" alt="${currentIdea.title || ''}">
+        <img
+          src="${imgSrc}"
+          alt="${imgAlt}"
+          width="${DETAIL_IMG_WIDTH}"
+          height="${DETAIL_IMG_HEIGHT}"
+        >
         <button type="button" class="pi-idea-card-fav ${active ? 'is-active' : ''}" aria-label="Toggle favorite">
           ❤
         </button>
@@ -45,6 +56,7 @@ export default async function decorate(block) {
   const img = wrapper.querySelector('.pi-idea-detail-image img');
   if (img) {
     img.decoding = 'async';
+    img.loading = 'eager';
   }
 
   block.textContent = '';

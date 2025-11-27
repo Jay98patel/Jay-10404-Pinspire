@@ -1,6 +1,4 @@
-// scripts/pi-ideas-index.js
-
-const INDEX_URL = '/query-index.json'; // JSON view of the query-index sheet
+const INDEX_URL = '/query-index.json';
 let ideasCache = null;
 
 function normalizeTags(rawTags) {
@@ -10,7 +8,6 @@ function normalizeTags(rawTags) {
   const str = String(rawTags).trim();
   if (!str) return [];
 
-  // Try JSON, e.g. `["tag1","tag2"]`
   try {
     const parsed = JSON.parse(str);
     if (Array.isArray(parsed)) {
@@ -19,11 +16,9 @@ function normalizeTags(rawTags) {
         .filter(Boolean);
     }
   } catch (e) {
-    // fall through
   }
 
-  // Fallback: comma-separated list
-  return str
+  return String(str)
     .split(',')
     .map((t) => t.trim())
     .filter(Boolean);
@@ -66,13 +61,11 @@ function normalizeIdea(row) {
   };
 }
 
-
 export async function loadIdeas() {
   if (ideasCache) return ideasCache;
 
   const resp = await fetch(INDEX_URL);
   if (!resp.ok) {
-    // eslint-disable-next-line no-console
     console.warn('Failed to load ideas index', resp.status, resp.statusText);
     ideasCache = [];
     return ideasCache;

@@ -1,6 +1,9 @@
 import { toggleFavorite, isFavorite } from '../../scripts/pi-favorites.js';
 import { isAuthenticated, openLoginModal } from '../../scripts/pi-auth.js';
 
+const CARD_IMAGE_WIDTH = 360;
+const CARD_IMAGE_HEIGHT = 540;
+
 export function createIdeaCard(idea, isEager = false) {
   const rawId = idea.id || idea.path || '';
   const id = String(rawId).trim();
@@ -17,7 +20,12 @@ export function createIdeaCard(idea, isEager = false) {
   card.innerHTML = `
     <a class="pi-idea-card-link" href="${path}">
       <div class="pi-idea-card-image-wrap">
-        <img src="${image}" alt="${title}">
+        <img
+          src="${image}"
+          alt="${title}"
+          width="${CARD_IMAGE_WIDTH}"
+          height="${CARD_IMAGE_HEIGHT}"
+        >
         <button type="button" class="pi-idea-card-fav" aria-label="Toggle favorite"></button>
         <div class="pi-idea-card-overlay">
           <h3 class="pi-idea-card-title">${title}</h3>

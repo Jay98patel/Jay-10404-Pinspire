@@ -13,14 +13,9 @@ import {
   loadCSS,
 } from './aem.js';
 
-/**
- * Builds hero block and prepends to main in a new section.
- * @param {Element} main The container element
- */
 function buildHeroBlock(main) {
   const h1 = main.querySelector('h1');
   const picture = main.querySelector('picture');
-  // eslint-disable-next-line no-bitwise
   if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
     const section = document.createElement('div');
     section.append(buildBlock('hero', { elems: [picture, h1] }));
@@ -28,28 +23,20 @@ function buildHeroBlock(main) {
   }
 }
 
-/**
- * load fonts.css and set a session storage flag
- */
 async function loadFonts() {
   await loadCSS(`${window.hlx.codeBasePath}/styles/fonts.css`);
   try {
-    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
+    if (!window.location.hostname.includes('localhost')) {
+      sessionStorage.setItem('fonts-loaded', 'true');
+    }
   } catch (e) {
-    // do nothing
   }
 }
 
-/**
- * Builds all synthetic blocks in a container element.
- * @param {Element} main The container element
- */
 function buildAutoBlocks(main) {
   try {
-    // auto block `*/fragments/*` references
     const fragments = main.querySelectorAll('a[href*="/fragments/"]');
     if (fragments.length > 0) {
-      // eslint-disable-next-line import/no-cycle
       import('../blocks/fragment/fragment.js').then(({ loadFragment }) => {
         fragments.forEach(async (fragment) => {
           try {
@@ -57,7 +44,6 @@ function buildAutoBlocks(main) {
             const frag = await loadFragment(pathname);
             fragment.parentElement.replaceWith(frag.firstElementChild);
           } catch (error) {
-            // eslint-disable-next-line no-console
             console.error('Fragment loading failed', error);
           }
         });
@@ -66,18 +52,11 @@ function buildAutoBlocks(main) {
 
     buildHeroBlock(main);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
   }
 }
 
-/**
- * Decorates the main element.
- * @param {Element} main The main element
- */
-// eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
-  // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
@@ -85,13 +64,25 @@ export function decorateMain(main) {
   decorateBlocks(main);
 }
 
-/**
- * Loads everything needed to get to LCP.
- * @param {Element} doc The container element
- */
+function preloadIdeasIndex() {
+  try {
+    const head = document.head || document.getElementsByTagName('head')[0];
+    if (!head || head.querySelector('link[data-preload="ideas-index"]')) return;
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'fetch';
+    link.href = '/query-index.json';
+    link.crossOrigin = 'anonymous';
+    link.dataset.preload = 'ideas-index';
+    head.appendChild(link);
+  } catch (e) {
+  }
+}
+
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
+  preloadIdeasIndex();
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
@@ -100,19 +91,13 @@ async function loadEager(doc) {
   }
 
   try {
-    /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
     if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
       loadFonts();
     }
   } catch (e) {
-    // do nothing
   }
 }
 
-/**
- * Loads everything that doesn't need to be delayed.
- * @param {Element} doc The container element
- */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
   await loadSections(main);

@@ -4,9 +4,6 @@ indices:
       - '/ideas/**'
     target: '/query-index.json'
     properties:
-      path:
-        value: path
-
       id:
         selectFirst: head meta[name="id"]
         value: attribute(el, 'content')
@@ -38,6 +35,3 @@ indices:
       isTrending:
         selectFirst: head meta[name="istrending"], head meta[name="isTrending"]
         value: attribute(el, 'content')
-
-      lastModified:
-        value: lastmodified

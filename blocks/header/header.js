@@ -119,25 +119,22 @@ export default async function decorate(block) {
   logoLink.href = '/';
   logoLink.className = 'pi-header-logo';
 
-  if (logoPicture) {
+  if (brandLogoPath && typeof Image !== 'undefined') {
+    const img = document.createElement('img');
+    img.alt = 'Pinspire';
+    img.width = 120;
+    img.height = 32;
+    img.decoding = 'async';
+    img.loading = 'eager';
+    img.src = brandLogoPath;
+    logoLink.append(img);
+  } else if (logoPicture) {
     logoLink.append(logoPicture);
   } else {
     const logoSpan = document.createElement('span');
     logoSpan.className = 'pi-header-logo-fallback';
     logoSpan.textContent = 'P';
     logoLink.append(logoSpan);
-  }
-
-  if (brandLogoPath && typeof Image !== 'undefined') {
-    const img = document.createElement('img');
-    img.alt = 'Pinspire';
-    img.addEventListener('load', () => {
-      logoLink.innerHTML = '';
-      logoLink.append(img);
-    });
-    img.addEventListener('error', () => {
-    });
-    img.src = brandLogoPath;
   }
 
   const exploreLabel = document.createElement('span');
